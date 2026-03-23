@@ -1,3 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter Tight', 'Segoe UI', sans-serif;
+  --color-background: #f5f7fb;
+  --color-surface: #ffffff;
+  --color-surface-strong: #e8eefc;
+  --color-border: #d7dfef;
+  --color-text: #142033;
+  --color-text-muted: #52627c;
+  --color-primary: #1d4ed8;
+  --color-primary-strong: #1e3a8a;
+  --color-success-soft: #dcfce7;
+  --color-success-text: #166534;
+  --color-danger-soft: #fee2e2;
+  --color-danger-text: #b91c1c;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top, rgba(29, 78, 216, 0.12), transparent 35%),
+    linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+* {
+  box-sizing: border-box;
+}
