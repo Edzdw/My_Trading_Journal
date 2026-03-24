@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiBaseUrl: 'tradejournalbe-production.up.railway.app/api/v1'
+  production: true,
+  apiBaseUrl: 'https://tradejournalbe-production.up.railway.app/api/v1'
 };
