@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'my-trading-journal-ten.vercel.app/api/v1'
+  apiBaseUrl: 'tradejournalbe-production.up.railway.app/api/v1'
 };
