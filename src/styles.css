@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: 'Inter Tight', 'Segoe UI', sans-serif;
@@ -28,6 +29,16 @@ body {
     linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
   color: var(--color-text);
   font-family: var(--font-sans);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+.dark body {
+  background:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 35%),
+    linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  color: #e2e8f0;
 }
 
 * {

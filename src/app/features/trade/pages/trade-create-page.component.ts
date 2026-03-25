@@ -1,10 +1,11 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { CreateTradeFormValue, TradeService } from '../data-access/trade.service';
-import { TradeMarketType, TradeSide } from '../types/trade.models';
+import { I18nService } from '../../../core/services/i18n.service';
+import { TradeService } from '../data-access/trade.service';
+import { buildTradeForm } from '../utils/trade-form.util';
 
 @Component({
   selector: 'app-trade-create-page',
@@ -13,15 +14,17 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
     <section class="space-y-6">
       <div class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white/70 p-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-700">Trades</p>
-          <h2 class="mt-2 text-2xl font-semibold text-slate-950">Create Trade</h2>
-          <p class="mt-1 text-sm text-slate-500">Submits to POST /api/v1/trades and redirects back to the trade list on success.</p>
+          <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-700">{{ i18n.t('trade.nav.trades') }}</p>
+          <h2 class="mt-2 text-3xl font-semibold text-slate-950">{{ i18n.t('trade.create.title') }}</h2>
+          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            {{ i18n.t('trade.create.description') }}
+          </p>
         </div>
 
         <a
           routerLink="/app/trades"
           class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-          Back to Trades
+          {{ i18n.t('common.actions.backToTrades') }}
         </a>
       </div>
 
@@ -36,7 +39,7 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
         [formGroup]="tradeForm"
         (ngSubmit)="onSubmit()">
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Symbol</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.symbol') }}</span>
           <input
             type="text"
             formControlName="symbol"
@@ -45,29 +48,29 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
         </label>
 
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Market Type</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.marketType') }}</span>
           <select
             formControlName="marketType"
             class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-            @for (marketType of marketTypes; track marketType) {
-              <option [value]="marketType">{{ marketType }}</option>
-            }
+            <option value="CRYPTO">{{ i18n.t('trade.form.marketType.crypto') }}</option>
+            <option value="FOREX">{{ i18n.t('trade.form.marketType.forex') }}</option>
+            <option value="STOCK">{{ i18n.t('trade.form.marketType.stock') }}</option>
+            <option value="FUTURES">{{ i18n.t('trade.form.marketType.futures') }}</option>
           </select>
         </label>
 
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Side</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.side') }}</span>
           <select
             formControlName="side"
             class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-            @for (side of sides; track side) {
-              <option [value]="side">{{ side }}</option>
-            }
+            <option value="BUY">{{ i18n.t('trade.form.side.buy') }}</option>
+            <option value="SELL">{{ i18n.t('trade.form.side.sell') }}</option>
           </select>
         </label>
 
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Open Time</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.openTime') }}</span>
           <input
             type="datetime-local"
             formControlName="openTime"
@@ -75,7 +78,7 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
         </label>
 
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Entry Price</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.entryPrice') }}</span>
           <input
             type="text"
             formControlName="entryPrice"
@@ -84,7 +87,7 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
         </label>
 
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Stop Loss</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.stopLoss') }}</span>
           <input
             type="text"
             formControlName="stopLoss"
@@ -93,7 +96,7 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
         </label>
 
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Take Profit</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.takeProfit') }}</span>
           <input
             type="text"
             formControlName="takeProfit"
@@ -102,7 +105,7 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
         </label>
 
         <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">Quantity</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.quantity') }}</span>
           <input
             type="text"
             formControlName="quantity"
@@ -111,20 +114,20 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
         </label>
 
         <label class="space-y-2 lg:col-span-2">
-          <span class="text-sm font-medium text-slate-700">Thesis</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.thesis') }}</span>
           <textarea
             rows="4"
             formControlName="thesis"
-            placeholder="Breakout above resistance with volume confirmation"
+            [placeholder]="i18n.t('trade.form.placeholders.thesis')"
             class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"></textarea>
         </label>
 
         <label class="space-y-2 lg:col-span-2">
-          <span class="text-sm font-medium text-slate-700">Note</span>
+          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.note') }}</span>
           <textarea
             rows="4"
             formControlName="note"
-            placeholder="Updated take profit after momentum confirmation"
+            [placeholder]="i18n.t('trade.form.placeholders.note')"
             class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"></textarea>
         </label>
 
@@ -133,7 +136,7 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
             type="submit"
             class="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-blue-300"
             [disabled]="isSubmitting()">
-            {{ isSubmitting() ? 'Saving trade...' : 'Save Trade' }}
+            {{ isSubmitting() ? i18n.t('trade.create.submitting') : i18n.t('trade.create.submit') }}
           </button>
         </div>
       </form>
@@ -141,8 +144,7 @@ import { TradeMarketType, TradeSide } from '../types/trade.models';
   `
 })
 export class TradeCreatePageComponent {
-  protected readonly marketTypes: TradeMarketType[] = ['CRYPTO', 'FOREX', 'STOCK', 'FUTURES'];
-  protected readonly sides: TradeSide[] = ['BUY', 'SELL'];
+  protected readonly i18n = inject(I18nService);
 
   private readonly formBuilder = inject(FormBuilder);
   private readonly tradeService = inject(TradeService);
@@ -151,18 +153,7 @@ export class TradeCreatePageComponent {
 
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
-  protected readonly tradeForm = this.formBuilder.nonNullable.group({
-    symbol: ['', [Validators.required]],
-    marketType: ['CRYPTO' as TradeMarketType, [Validators.required]],
-    side: ['BUY' as TradeSide, [Validators.required]],
-    entryPrice: ['', [Validators.required]],
-    stopLoss: ['', [Validators.required]],
-    takeProfit: ['', [Validators.required]],
-    quantity: ['', [Validators.required]],
-    openTime: ['', [Validators.required]],
-    thesis: [''],
-    note: ['']
-  });
+  protected readonly tradeForm = buildTradeForm(this.formBuilder);
 
   protected onSubmit(): void {
     if (this.tradeForm.invalid) {
@@ -174,7 +165,7 @@ export class TradeCreatePageComponent {
     this.errorMessage.set(null);
 
     this.tradeService
-      .createTrade(this.tradeForm.getRawValue() as CreateTradeFormValue)
+      .createTrade(this.tradeForm.getRawValue())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -183,7 +174,7 @@ export class TradeCreatePageComponent {
         },
         error: (error) => {
           this.isSubmitting.set(false);
-          this.errorMessage.set(error?.error?.message ?? 'Unable to create the trade right now.');
+          this.errorMessage.set(error?.error?.message ?? this.i18n.t('trade.create.error'));
         }
       });
   }

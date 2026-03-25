@@ -1,21 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { CreateTradeRequest, Trade } from '../types/trade.models';
+import { Trade } from '../types/trade.models';
 import { TradeApiService } from './trade-api.service';
-
-export interface CreateTradeFormValue {
-  symbol: string;
-  marketType: string;
-  side: string;
-  entryPrice: string;
-  stopLoss: string;
-  takeProfit: string;
-  quantity: string;
-  openTime: string;
-  thesis: string;
-  note: string;
-}
+import {
+  mapTradeFormValueToCreateRequest,
+  mapTradeFormValueToUpdateRequest,
+  TradeFormValue
+} from '../utils/trade-form.util';
 
 @Injectable({
   providedIn: 'root'
@@ -27,27 +19,19 @@ export class TradeService {
     return this.tradeApi.list();
   }
 
-  createTrade(formValue: CreateTradeFormValue): Observable<Trade> {
-    return this.tradeApi.create(this.mapCreateTradePayload(formValue));
+  getTradeById(tradeId: string): Observable<Trade> {
+    return this.tradeApi.getById(tradeId);
   }
 
-  private mapCreateTradePayload(formValue: CreateTradeFormValue): CreateTradeRequest {
-    return {
-      symbol: formValue.symbol.trim().toUpperCase(),
-      marketType: formValue.marketType as CreateTradeRequest['marketType'],
-      side: formValue.side as CreateTradeRequest['side'],
-      entryPrice: formValue.entryPrice.trim(),
-      stopLoss: formValue.stopLoss.trim(),
-      takeProfit: formValue.takeProfit.trim(),
-      quantity: formValue.quantity.trim(),
-      openTime: new Date(formValue.openTime).toISOString(),
-      thesis: this.nullableText(formValue.thesis),
-      note: this.nullableText(formValue.note)
-    };
+  createTrade(formValue: TradeFormValue): Observable<Trade> {
+    return this.tradeApi.create(mapTradeFormValueToCreateRequest(formValue));
   }
 
-  private nullableText(value: string): string | null {
-    const trimmedValue = value.trim();
-    return trimmedValue.length > 0 ? trimmedValue : null;
+  updateTrade(tradeId: string, formValue: TradeFormValue): Observable<Trade> {
+    return this.tradeApi.update(tradeId, mapTradeFormValueToUpdateRequest(formValue));
+  }
+
+  deleteTrade(tradeId: string): Observable<void> {
+    return this.tradeApi.delete(tradeId);
   }
 }

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../auth/data-access/auth.service';
-import { CreateTradeRequest, Trade } from '../types/trade.models';
+import { CreateTradeRequest, Trade, UpdateTradeRequest } from '../types/trade.models';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,26 @@ export class TradeApiService {
     });
   }
 
+  getById(tradeId: string): Observable<Trade> {
+    return this.api.get<Trade>(`${this.tradesPath}/${tradeId}`, {
+      headers: this.buildAuthHeaders()
+    });
+  }
+
+  update(tradeId: string, payload: UpdateTradeRequest): Observable<Trade> {
+    return this.api.patch<Trade, UpdateTradeRequest>(`${this.tradesPath}/${tradeId}`, payload, {
+      headers: this.buildAuthHeaders()
+    });
+  }
+
+  delete(tradeId: string): Observable<void> {
+    return this.api.delete<void>(`${this.tradesPath}/${tradeId}`, {
+      headers: this.buildAuthHeaders()
+    });
+  }
+
   private buildAuthHeaders(): HttpHeaders {
+    this.authService.restoreSession();
     const accessToken = this.authService.getAccessToken();
 
     return new HttpHeaders(

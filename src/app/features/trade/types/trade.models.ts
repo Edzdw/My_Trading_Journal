@@ -36,3 +36,5 @@ export interface CreateTradeRequest {
   thesis: string | null;
   note: string | null;
 }
+
+export type UpdateTradeRequest = Partial<CreateTradeRequest>;

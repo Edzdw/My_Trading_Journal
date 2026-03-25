@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
+import { publicAuthGuard } from './core/guards/public-auth.guard';
 
 export const routes: Routes = [
   {
@@ -10,11 +11,13 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [publicAuthGuard],
     loadComponent: () =>
       import('./features/auth/pages/login-page.component').then((m) => m.LoginPageComponent)
   },
   {
     path: 'register',
+    canActivate: [publicAuthGuard],
     loadComponent: () =>
       import('./features/auth/pages/register-page.component').then((m) => m.RegisterPageComponent)
   },
@@ -38,6 +41,11 @@ export const routes: Routes = [
         path: 'trades/new',
         loadComponent: () =>
           import('./features/trade/pages/trade-create-page.component').then((m) => m.TradeCreatePageComponent)
+      },
+      {
+        path: 'trades/:tradeId/edit',
+        loadComponent: () =>
+          import('./features/trade/pages/trade-edit-page.component').then((m) => m.TradeEditPageComponent)
       }
     ]
   },

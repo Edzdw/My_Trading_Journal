@@ -22,6 +22,10 @@ export interface UserProfile {
   deletedAt: string | null;
 }
 
+export interface ProfileResponse {
+  user: UserProfile;
+}
+
 export interface AuthResponse {
   user: UserProfile;
   tokens: AuthTokens;

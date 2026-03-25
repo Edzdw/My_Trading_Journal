@@ -32,6 +32,24 @@ export class ApiService {
     });
   }
 
+  patch<TResponse, TBody>(
+    path: string,
+    body: TBody,
+    options?: { params?: QueryParams; headers?: HttpHeaders }
+  ): Observable<TResponse> {
+    return this.http.patch<TResponse>(this.buildUrl(path), body, {
+      params: this.buildParams(options?.params),
+      headers: options?.headers
+    });
+  }
+
+  delete<T>(path: string, options?: { params?: QueryParams; headers?: HttpHeaders }): Observable<T> {
+    return this.http.delete<T>(this.buildUrl(path), {
+      params: this.buildParams(options?.params),
+      headers: options?.headers
+    });
+  }
+
   private buildUrl(path: string): string {
     return `${this.apiBaseUrl}${path.startsWith('/') ? path : `/${path}`}`;
   }

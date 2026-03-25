@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../core/services/api.service';
-import { AuthResponse, LoginRequest, RegisterRequest, UserProfile } from '../types/auth.models';
+import { AuthResponse, LoginRequest, ProfileResponse, RegisterRequest } from '../types/auth.models';
 
 @Injectable({
   providedIn: 'root'
@@ -24,8 +24,8 @@ export class AuthApiService {
     return this.api.post<void, { refreshToken: string }>(`${this.authPath}/logout`, { refreshToken });
   }
 
-  profile(accessToken: string): Observable<UserProfile> {
-    return this.api.get<UserProfile>(`${this.authPath}/profile`, {
+  profile(accessToken: string): Observable<ProfileResponse> {
+    return this.api.get<ProfileResponse>(`${this.authPath}/profile`, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${accessToken}`
       })
