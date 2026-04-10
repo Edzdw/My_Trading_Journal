@@ -38,3 +38,63 @@ export interface CreateTradeRequest {
 }
 
 export type UpdateTradeRequest = Partial<CreateTradeRequest>;
+
+export interface TradeImportPreviewSummary {
+  sourceType: 'MT5_HTML';
+  originalFilename: string;
+  accountNo: string | null;
+  accountName: string | null;
+  brokerName: string | null;
+  brokerServer: string | null;
+  reportDate: string | null;
+  totalRows: number;
+  parsedRows: number;
+  skippedRows: number;
+}
+
+export interface TradeImportPreviewTradeRow {
+  externalPositionId: string;
+  externalOrderId: string | null;
+  symbol: string;
+  side: string;
+  quantity: string | null;
+  entryPrice: string | null;
+  stopLoss: string | null;
+  takeProfit: string | null;
+  openTime: string | null;
+  exitPrice: string | null;
+  closeTime: string | null;
+  commission: string | null;
+  swap: string | null;
+  fee: string | null;
+  profit: string | null;
+  closeReason: 'TP' | 'SL' | 'UNKNOWN' | null;
+  rawComment: string | null;
+}
+
+export interface TradeImportPreviewResponse {
+  summary: TradeImportPreviewSummary;
+  trades: TradeImportPreviewTradeRow[];
+  warnings: string[];
+  errors: string[];
+}
+
+export interface TradeImportConfirmSummary {
+  sourceType: 'MT5_HTML';
+  originalFilename: string;
+  importBatchId: string;
+  accountNo: string | null;
+  accountName: string | null;
+  brokerName: string | null;
+  brokerServer: string | null;
+  reportDate: string | null;
+  totalRows: number;
+  importedRows: number;
+  skippedRows: number;
+}
+
+export interface TradeImportConfirmResponse {
+  summary: TradeImportConfirmSummary;
+  warnings: string[];
+  errors: string[];
+}

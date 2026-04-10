@@ -1,0 +1,493 @@
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { I18nService } from '../../../core/services/i18n.service';
+import { TradeService } from '../data-access/trade.service';
+import {
+  TradeImportConfirmResponse,
+  TradeImportPreviewResponse,
+  TradeImportPreviewTradeRow
+} from '../types/trade.models';
+
+@Component({
+  selector: 'app-trade-import-page',
+  imports: [NgClass],
+  providers: [DecimalPipe, DatePipe],
+  template: `
+    <section class="space-y-6">
+      <div class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
+        <div class="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+          <div class="max-w-3xl">
+            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-700 dark:text-blue-300">
+              {{ i18n.t('trade.nav.importTrades') }}
+            </p>
+            <h2 class="mt-2 text-3xl font-semibold text-slate-950 dark:text-slate-100">
+              {{ i18n.t('trade.import.title') }}
+            </h2>
+            <p class="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+              {{ i18n.t('trade.import.description') }}
+            </p>
+            <p class="mt-3 text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+              {{ i18n.t('trade.import.sourceNote') }}
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              [disabled]="isPreviewing() || isConfirming()"
+              (click)="fileInput.click()">
+              {{ i18n.t('trade.import.uploadLabel') }}
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-blue-300 dark:bg-blue-600 dark:hover:bg-blue-500 dark:disabled:bg-slate-700"
+              [disabled]="!selectedFile() || isPreviewing() || isConfirming()"
+              (click)="previewImport()">
+              {{ isPreviewing() ? i18n.t('trade.import.previewing') : i18n.t('trade.import.preview') }}
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400 dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:disabled:bg-slate-700"
+              [disabled]="!canConfirmImport()"
+              (click)="confirmImport()">
+              {{ isConfirming() ? i18n.t('trade.import.confirming') : i18n.t('trade.import.confirm') }}
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              [disabled]="isPreviewing() || isConfirming()"
+              (click)="resetState()">
+              {{ i18n.t('trade.import.reset') }}
+            </button>
+          </div>
+        </div>
+
+        <input
+          #fileInput
+          type="file"
+          accept=".html,.htm,text/html"
+          class="hidden"
+          (change)="onFileSelected($event)" />
+
+        <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-6 dark:border-slate-700 dark:bg-slate-900/60">
+          <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ i18n.t('trade.import.uploadLabel') }}</p>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('trade.import.uploadHelp') }}</p>
+
+          <div class="mt-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-950/80">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+              {{ i18n.t('trade.import.selectedFile') }}
+            </p>
+            <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">
+              {{ selectedFileName() ?? i18n.t('trade.import.noFileSelected') }}
+            </p>
+          </div>
+
+          @if (!selectedFile() && !previewResponse()) {
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('trade.import.previewRequired') }}</p>
+          }
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-950/40 dark:text-red-200">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/40 dark:text-emerald-200">
+          {{ successMessage() }}
+        </div>
+      }
+
+      @if (previewResponse(); as preview) {
+        <div class="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
+            <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('trade.import.metadata.title') }}</h3>
+            <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.originalFilename') }}</p>
+                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.originalFilename }}</p>
+              </article>
+              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.accountNo') }}</p>
+                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.accountNo ?? i18n.t('common.states.notAvailable') }}</p>
+              </article>
+              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.accountName') }}</p>
+                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.accountName ?? i18n.t('common.states.notAvailable') }}</p>
+              </article>
+              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.brokerName') }}</p>
+                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.brokerName ?? i18n.t('common.states.notAvailable') }}</p>
+              </article>
+              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.brokerServer') }}</p>
+                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.brokerServer ?? i18n.t('common.states.notAvailable') }}</p>
+              </article>
+              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.reportDate') }}</p>
+                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ formatDateValue(preview.summary.reportDate) }}</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
+            <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('trade.import.confirmSummary.title') }}</h3>
+            <div class="mt-5 grid gap-4 sm:grid-cols-3">
+              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.totalRows') }}</p>
+                <p class="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-100">{{ preview.summary.totalRows }}</p>
+              </article>
+              <article class="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-950/30">
+                <p class="text-xs uppercase tracking-[0.2em] text-blue-700 dark:text-blue-200">{{ i18n.t('trade.import.metadata.parsedRows') }}</p>
+                <p class="mt-2 text-2xl font-semibold text-blue-900 dark:text-blue-100">{{ preview.summary.parsedRows }}</p>
+              </article>
+              <article class="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/30 dark:bg-amber-950/30">
+                <p class="text-xs uppercase tracking-[0.2em] text-amber-700 dark:text-amber-200">{{ i18n.t('trade.import.metadata.skippedRows') }}</p>
+                <p class="mt-2 text-2xl font-semibold text-amber-900 dark:text-amber-100">{{ preview.summary.skippedRows }}</p>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-2">
+          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
+            <h3 class="text-lg font-semibold text-amber-900 dark:text-amber-100">{{ i18n.t('trade.import.warningsTitle') }}</h3>
+            @if (preview.warnings.length > 0) {
+              <ul class="mt-4 space-y-3">
+                @for (warning of preview.warnings; track warning) {
+                  <li class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
+                    {{ warning }}
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('common.states.notAvailable') }}</p>
+            }
+          </section>
+
+          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
+            <h3 class="text-lg font-semibold text-red-900 dark:text-red-100">{{ i18n.t('trade.import.errorsTitle') }}</h3>
+            @if (preview.errors.length > 0) {
+              <ul class="mt-4 space-y-3">
+                @for (previewError of preview.errors; track previewError) {
+                  <li class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-200">
+                    {{ previewError }}
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('common.states.notAvailable') }}</p>
+            }
+          </section>
+        </div>
+
+        <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
+          <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('trade.import.previewTable.title') }}</h3>
+              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('trade.import.previewTable.description') }}</p>
+            </div>
+          </div>
+
+          @if (preview.trades.length === 0) {
+            <div class="mt-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+              {{ i18n.t('trade.import.previewTable.empty') }}
+            </div>
+          } @else {
+            <div class="mt-5 overflow-x-auto">
+              <table class="min-w-full border-separate border-spacing-0">
+                <thead>
+                  <tr>
+                    @for (column of previewColumns; track column.key) {
+                      <th class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 first:rounded-tl-2xl last:rounded-tr-2xl dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
+                        {{ i18n.t(column.labelKey) }}
+                      </th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (trade of preview.trades; track trackTradeRow($index, trade)) {
+                    <tr class="align-top">
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm font-medium text-slate-900 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-100">{{ trade.externalPositionId }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ trade.symbol }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm dark:border-slate-800 dark:bg-slate-950/40">
+                        <span
+                          class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                          [ngClass]="trade.side === 'BUY' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-200'">
+                          {{ formatSideLabel(trade.side) }}
+                        </span>
+                      </td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.quantity) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.entryPrice) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.stopLoss) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.takeProfit) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatDateValue(trade.openTime) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.exitPrice) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatDateValue(trade.closeTime) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.commission) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.swap) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.fee) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm font-medium dark:border-slate-800 dark:bg-slate-950/40" [ngClass]="getProfitClass(trade.profit)">
+                        {{ formatNumber(trade.profit) }}
+                      </td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatCloseReason(trade.closeReason) }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ trade.externalOrderId ?? i18n.t('common.states.notAvailable') }}</td>
+                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ trade.rawComment ?? i18n.t('common.states.notAvailable') }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+
+      @if (confirmResponse(); as confirmResult) {
+        <section class="rounded-[2rem] border border-emerald-200 bg-emerald-50/90 p-6 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-950/30">
+          <h3 class="text-xl font-semibold text-emerald-900 dark:text-emerald-100">{{ i18n.t('trade.import.confirmSummary.title') }}</h3>
+          <div class="mt-5 grid gap-4 md:grid-cols-4">
+            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
+              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.importBatchId') }}</p>
+              <p class="mt-2 break-all text-sm font-medium text-slate-900 dark:text-slate-100">{{ confirmResult.summary.importBatchId }}</p>
+            </article>
+            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
+              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.totalRows') }}</p>
+              <p class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{{ confirmResult.summary.totalRows }}</p>
+            </article>
+            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
+              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.importedRows') }}</p>
+              <p class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{{ confirmResult.summary.importedRows }}</p>
+            </article>
+            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
+              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.skippedRows') }}</p>
+              <p class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{{ confirmResult.summary.skippedRows }}</p>
+            </article>
+          </div>
+
+          @if (confirmResult.warnings.length > 0) {
+            <div class="mt-6">
+              <h4 class="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-900 dark:text-emerald-100">{{ i18n.t('trade.import.warningsTitle') }}</h4>
+              <ul class="mt-3 space-y-3">
+                @for (warning of confirmResult.warnings; track warning) {
+                  <li class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
+                    {{ warning }}
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </section>
+      }
+    </section>
+  `
+})
+export class TradeImportPageComponent {
+  protected readonly i18n = inject(I18nService);
+
+  private readonly tradeService = inject(TradeService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly decimalPipe = inject(DecimalPipe);
+  private readonly datePipe = inject(DatePipe);
+  private readonly fileInputRef = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
+
+  protected readonly selectedFile = signal<File | null>(null);
+  protected readonly selectedFileName = signal<string | null>(null);
+  protected readonly previewResponse = signal<TradeImportPreviewResponse | null>(null);
+  protected readonly confirmResponse = signal<TradeImportConfirmResponse | null>(null);
+  protected readonly isPreviewing = signal(false);
+  protected readonly isConfirming = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly successMessage = signal<string | null>(null);
+
+  protected readonly previewColumns = [
+    { key: 'externalPositionId', labelKey: 'trade.import.previewTable.fields.externalPositionId' },
+    { key: 'symbol', labelKey: 'trade.import.previewTable.fields.symbol' },
+    { key: 'side', labelKey: 'trade.import.previewTable.fields.side' },
+    { key: 'quantity', labelKey: 'trade.import.previewTable.fields.quantity' },
+    { key: 'entryPrice', labelKey: 'trade.import.previewTable.fields.entryPrice' },
+    { key: 'stopLoss', labelKey: 'trade.import.previewTable.fields.stopLoss' },
+    { key: 'takeProfit', labelKey: 'trade.import.previewTable.fields.takeProfit' },
+    { key: 'openTime', labelKey: 'trade.import.previewTable.fields.openTime' },
+    { key: 'exitPrice', labelKey: 'trade.import.previewTable.fields.exitPrice' },
+    { key: 'closeTime', labelKey: 'trade.import.previewTable.fields.closeTime' },
+    { key: 'commission', labelKey: 'trade.import.previewTable.fields.commission' },
+    { key: 'swap', labelKey: 'trade.import.previewTable.fields.swap' },
+    { key: 'fee', labelKey: 'trade.import.previewTable.fields.fee' },
+    { key: 'profit', labelKey: 'trade.import.previewTable.fields.profit' },
+    { key: 'closeReason', labelKey: 'trade.import.previewTable.fields.closeReason' },
+    { key: 'externalOrderId', labelKey: 'trade.import.previewTable.fields.externalOrderId' },
+    { key: 'rawComment', labelKey: 'trade.import.previewTable.fields.rawComment' }
+  ];
+
+  protected onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    this.selectedFile.set(file);
+    this.selectedFileName.set(file?.name ?? null);
+    this.previewResponse.set(null);
+    this.confirmResponse.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+  }
+
+  protected previewImport(): void {
+    const file = this.selectedFile();
+    if (!file) {
+      this.errorMessage.set(this.i18n.t('trade.import.previewRequired'));
+      return;
+    }
+
+    this.isPreviewing.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.confirmResponse.set(null);
+
+    this.tradeService
+      .previewTradeImport(file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.previewResponse.set(response);
+          this.successMessage.set(this.i18n.t('trade.import.previewSuccess'));
+          this.isPreviewing.set(false);
+        },
+        error: (error) => {
+          this.errorMessage.set(this.extractErrorMessage(error));
+          this.isPreviewing.set(false);
+        }
+      });
+  }
+
+  protected confirmImport(): void {
+    const file = this.selectedFile();
+    if (!file || !this.previewResponse()) {
+      this.errorMessage.set(this.i18n.t('trade.import.previewRequired'));
+      return;
+    }
+
+    this.isConfirming.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    this.tradeService
+      .confirmTradeImport(file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.confirmResponse.set(response);
+          this.successMessage.set(this.i18n.t('trade.import.confirmSuccess'));
+          this.isConfirming.set(false);
+        },
+        error: (error) => {
+          this.errorMessage.set(this.extractErrorMessage(error));
+          this.isConfirming.set(false);
+        }
+      });
+  }
+
+  protected resetState(): void {
+    this.selectedFile.set(null);
+    this.selectedFileName.set(null);
+    this.previewResponse.set(null);
+    this.confirmResponse.set(null);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.fileInputRef().nativeElement.value = '';
+  }
+
+  protected canConfirmImport(): boolean {
+    return !!this.selectedFile() && !!this.previewResponse() && !this.isPreviewing() && !this.isConfirming();
+  }
+
+  protected trackTradeRow(index: number, trade: TradeImportPreviewTradeRow): string {
+    return `${trade.externalPositionId}-${trade.externalOrderId ?? 'no-order'}-${index}`;
+  }
+
+  protected formatNumber(value: string | null): string {
+    if (!value) {
+      return this.i18n.t('common.states.notAvailable');
+    }
+
+    const parsedValue = Number(value);
+    if (Number.isNaN(parsedValue)) {
+      return value;
+    }
+
+    return this.decimalPipe.transform(parsedValue, '1.0-8') ?? value;
+  }
+
+  protected formatDateValue(value: string | null): string {
+    if (!value) {
+      return this.i18n.t('common.states.notAvailable');
+    }
+
+    const formatted = this.datePipe.transform(value, 'medium');
+    return formatted ?? value;
+  }
+
+  protected formatSideLabel(side: string): string {
+    const key = `trade.list.side.${side.toLowerCase()}`;
+    const translated = this.i18n.t(key);
+    return translated === key ? side : translated;
+  }
+
+  protected formatCloseReason(closeReason: string | null): string {
+    if (!closeReason) {
+      return this.i18n.t('common.states.notAvailable');
+    }
+
+    const key = `trade.import.closeReason.${closeReason.toLowerCase()}`;
+    const translated = this.i18n.t(key);
+    return translated === key ? closeReason : translated;
+  }
+
+  protected getProfitClass(value: string | null): string {
+    if (!value) {
+      return 'text-slate-700 dark:text-slate-300';
+    }
+
+    const parsedValue = Number(value);
+    if (Number.isNaN(parsedValue)) {
+      return 'text-slate-700 dark:text-slate-300';
+    }
+
+    return parsedValue >= 0
+      ? 'text-emerald-700 dark:text-emerald-300'
+      : 'text-rose-700 dark:text-rose-300';
+  }
+
+  private extractErrorMessage(error: unknown): string {
+    const fallback = this.i18n.t('trade.import.requestError');
+    if (!error || typeof error !== 'object') {
+      return fallback;
+    }
+
+    const response = (error as { error?: unknown }).error;
+    if (typeof response === 'string') {
+      return response;
+    }
+
+    if (response && typeof response === 'object') {
+      const message = (response as { message?: unknown }).message;
+      if (typeof message === 'string') {
+        return message;
+      }
+
+      if (Array.isArray(message)) {
+        return message.join(', ');
+      }
+    }
+
+    const directMessage = (error as { message?: unknown }).message;
+    return typeof directMessage === 'string' ? directMessage : fallback;
+  }
+}

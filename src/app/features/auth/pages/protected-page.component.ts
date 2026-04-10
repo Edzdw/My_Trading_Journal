@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { I18nService } from '../../../core/services/i18n.service';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -9,7 +9,7 @@ import { AuthService } from '../data-access/auth.service';
 
 @Component({
   selector: 'app-protected-page',
-  imports: [RouterOutlet, LanguageSwitcherComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, LanguageSwitcherComponent],
   template: `
     <section class="min-h-dvh bg-transparent px-4 py-6 md:px-6">
       <div class="mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-7xl flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-2xl shadow-slate-900/10 backdrop-blur dark:border-slate-800/80 dark:bg-slate-900/85 dark:shadow-black/30">
@@ -22,8 +22,27 @@ import { AuthService } from '../data-access/auth.service';
                   <h1 class="text-2xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('auth.protected.title') }}</h1>
                   <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('auth.protected.subtitle') }}</p>
                 </div>
-
-
+                <nav class="flex flex-wrap gap-2 rounded-full bg-slate-100 p-1 text-sm font-medium text-slate-600 dark:bg-slate-900 dark:text-slate-300">
+                  <a
+                    routerLink="/app/trades"
+                    routerLinkActive="bg-white text-slate-950 shadow-sm dark:bg-slate-800 dark:text-slate-100"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="rounded-full px-4 py-2 transition hover:text-slate-900 dark:hover:text-slate-100">
+                    {{ i18n.t('auth.protected.nav.trades') }}
+                  </a>
+                  <a
+                    routerLink="/app/trades/new"
+                    routerLinkActive="bg-white text-slate-950 shadow-sm dark:bg-slate-800 dark:text-slate-100"
+                    class="rounded-full px-4 py-2 transition hover:text-slate-900 dark:hover:text-slate-100">
+                    {{ i18n.t('auth.protected.nav.newTrade') }}
+                  </a>
+                  <a
+                    routerLink="/app/trades/import"
+                    routerLinkActive="bg-white text-slate-950 shadow-sm dark:bg-slate-800 dark:text-slate-100"
+                    class="rounded-full px-4 py-2 transition hover:text-slate-900 dark:hover:text-slate-100">
+                    {{ i18n.t('auth.protected.nav.importTrades') }}
+                  </a>
+                </nav>
               </div>
             </div>
 

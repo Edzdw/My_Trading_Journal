@@ -1,7 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Trade } from '../types/trade.models';
+import {
+  Trade,
+  TradeImportConfirmResponse,
+  TradeImportPreviewResponse
+} from '../types/trade.models';
 import { TradeApiService } from './trade-api.service';
 import {
   mapTradeFormValueToCreateRequest,
@@ -33,5 +37,13 @@ export class TradeService {
 
   deleteTrade(tradeId: string): Observable<void> {
     return this.tradeApi.delete(tradeId);
+  }
+
+  previewTradeImport(file: File): Observable<TradeImportPreviewResponse> {
+    return this.tradeApi.previewImport(file);
+  }
+
+  confirmTradeImport(file: File): Observable<TradeImportConfirmResponse> {
+    return this.tradeApi.confirmImport(file);
   }
 }

@@ -4,7 +4,13 @@ import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../auth/data-access/auth.service';
-import { CreateTradeRequest, Trade, UpdateTradeRequest } from '../types/trade.models';
+import {
+  CreateTradeRequest,
+  Trade,
+  TradeImportConfirmResponse,
+  TradeImportPreviewResponse,
+  UpdateTradeRequest
+} from '../types/trade.models';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +32,26 @@ export class TradeApiService {
     });
   }
 
+  previewImport(file: File): Observable<TradeImportPreviewResponse> {
+    return this.api.post<TradeImportPreviewResponse, FormData>(
+      `${this.tradesPath}/import/preview`,
+      this.buildImportFormData(file),
+      {
+        headers: this.buildAuthHeaders()
+      }
+    );
+  }
+
+  confirmImport(file: File): Observable<TradeImportConfirmResponse> {
+    return this.api.post<TradeImportConfirmResponse, FormData>(
+      `${this.tradesPath}/import/confirm`,
+      this.buildImportFormData(file),
+      {
+        headers: this.buildAuthHeaders()
+      }
+    );
+  }
+
   getById(tradeId: string): Observable<Trade> {
     return this.api.get<Trade>(`${this.tradesPath}/${tradeId}`, {
       headers: this.buildAuthHeaders()
@@ -42,6 +68,12 @@ export class TradeApiService {
     return this.api.delete<void>(`${this.tradesPath}/${tradeId}`, {
       headers: this.buildAuthHeaders()
     });
+  }
+
+  private buildImportFormData(file: File): FormData {
+    const formData = new FormData();
+    formData.append('file', file);
+    return formData;
   }
 
   private buildAuthHeaders(): HttpHeaders {

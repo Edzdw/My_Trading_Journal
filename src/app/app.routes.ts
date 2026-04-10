@@ -43,6 +43,11 @@ export const routes: Routes = [
           import('./features/trade/pages/trade-create-page.component').then((m) => m.TradeCreatePageComponent)
       },
       {
+        path: 'trades/import',
+        loadComponent: () =>
+          import('./features/trade/pages/trade-import-page.component').then((m) => m.TradeImportPageComponent)
+      },
+      {
         path: 'trades/:tradeId/edit',
         loadComponent: () =>
           import('./features/trade/pages/trade-edit-page.component').then((m) => m.TradeEditPageComponent)

@@ -2,191 +2,278 @@ import { TranslationDictionary } from '../i18n.models';
 
 export const viTranslations: TranslationDictionary = {
   common: {
-    appName: 'Nhat ky giao dich',
-    language: 'Ngon ngu',
+    appName: 'Nhật ký giao dịch',
+    language: 'Ngôn ngữ',
     themes: {
-      light: 'Sang',
-      dark: 'Toi',
-      lightMode: 'Che do sang',
-      darkMode: 'Che do toi'
+      light: 'Sáng',
+      dark: 'Tối',
+      lightMode: 'Chế độ sáng',
+      darkMode: 'Chế độ tối'
     },
     actions: {
-      create: 'Tao',
-      edit: 'Sua',
-      delete: 'Xoa',
-      logout: 'Dang xuat',
-      back: 'Quay lai',
-      backToTrades: 'Quay lai danh sach lenh',
-      openProtectedPage: 'Mo trang bao ve'
+      create: 'Tạo',
+      edit: 'Sửa',
+      delete: 'Xóa',
+      logout: 'Đăng xuất',
+      back: 'Quay lại',
+      backToTrades: 'Quay lại danh sách lệnh',
+      openProtectedPage: 'Mở trang bảo vệ'
     },
     states: {
-      loading: 'Dang tai...',
-      notAvailable: 'Khong co'
+      loading: 'Đang tải...',
+      notAvailable: 'Không có'
     }
   },
+
   auth: {
     shell: {
-      headline: 'Xay dung thoi quen giao dich ky luat voi quy trinh gon gang hon.',
+      headline: 'Xây dựng thói quen giao dịch kỷ luật với quy trình gọn gàng hơn.',
       description:
-        'Bat dau tu xac thuc. Cac tinh nang danh muc, lenh giao dich va nhat ky co the gan vao nen tang nay sau ma khong can doi cau truc ung dung.',
-      currentFocusLabel: 'Trong tam hien tai',
+        'Bắt đầu từ xác thực. Các tính năng danh mục, lệnh giao dịch và nhật ký có thể được tích hợp vào nền tảng này mà không cần thay đổi cấu trúc ứng dụng.',
+      currentFocusLabel: 'Trọng tâm hiện tại',
       currentFocusDescription:
-        'Trang dang nhap don gian, luu token tren trinh duyet va cau truc Angular theo tung tinh nang.',
+        'Trang đăng nhập đơn giản, lưu token trên trình duyệt và cấu trúc Angular theo từng tính năng.',
       tabs: {
-        login: 'Dang nhap',
-        register: 'Tao tai khoan'
+        login: 'Đăng nhập',
+        register: 'Tạo tài khoản'
       }
     },
+
     login: {
-      title: 'Chao mung quay lai',
-      subtitle: 'Dang nhap de tiep tuc vao khu vuc nhat ky giao dich duoc bao ve.',
+      title: 'Chào mừng quay lại',
+      subtitle: 'Đăng nhập để tiếp tục vào khu vực nhật ký giao dịch được bảo vệ.',
       email: 'Email',
-      password: 'Mat khau',
-      passwordPlaceholder: 'Nhap mat khau cua ban',
-      submit: 'Dang nhap',
-      submitting: 'Dang dang nhap...',
-      noAccount: 'Chua co tai khoan?',
-      createOne: 'Tao tai khoan tai day',
-      existingSession: 'Da phat hien phien dang nhap hien co.',
-      fallbackError: 'Khong the dang nhap voi thong tin da cung cap.'
+      password: 'Mật khẩu',
+      passwordPlaceholder: 'Nhập mật khẩu của bạn',
+      submit: 'Đăng nhập',
+      submitting: 'Đang đăng nhập...',
+      noAccount: 'Chưa có tài khoản?',
+      createOne: 'Tạo tài khoản tại đây',
+      existingSession: 'Đã phát hiện phiên đăng nhập hiện có.',
+      fallbackError: 'Không thể đăng nhập với thông tin đã cung cấp.'
     },
+
     register: {
-      title: 'Tao tai khoan cua ban',
-      subtitle: 'Dang ky mot lan, luu token duoc cap va tiep tuc vao khu vuc bao ve.',
+      title: 'Tạo tài khoản của bạn',
+      subtitle: 'Đăng ký một lần, lưu token và tiếp tục vào khu vực bảo vệ.',
       email: 'Email',
-      password: 'Mat khau',
-      passwordPlaceholder: 'Tao mat khau',
-      submit: 'Tao tai khoan',
-      submitting: 'Dang tao tai khoan...',
-      existingAccount: 'Da co tai khoan?',
-      signInHere: 'Dang nhap tai day',
-      fallbackError: 'Khong the tao tai khoan luc nay.'
+      password: 'Mật khẩu',
+      passwordPlaceholder: 'Tạo mật khẩu',
+      submit: 'Tạo tài khoản',
+      submitting: 'Đang tạo tài khoản...',
+      existingAccount: 'Đã có tài khoản?',
+      signInHere: 'Đăng nhập tại đây',
+      fallbackError: 'Không thể tạo tài khoản lúc này.'
     },
+
     protected: {
-      title: 'Ung dung bao ve',
-      subtitle: 'Giai doan 1 bao gom nen tang xac thuc va quan ly giao dich.',
-      signedInAs: 'Dang nhap voi',
-      currentUser: 'Nguoi dung hien tai',
-      logoutSubmitting: 'Dang dang xuat...',
-      logoutError: 'Khong the dang xuat luc nay.',
+      title: 'Ứng dụng bảo vệ',
+      subtitle: 'Giai đoạn 1 bao gồm xác thực và quản lý giao dịch.',
+      signedInAs: 'Đăng nhập với',
+      currentUser: 'Người dùng hiện tại',
+      logoutSubmitting: 'Đang đăng xuất...',
+      logoutError: 'Không thể đăng xuất lúc này.',
       nav: {
-        trades: 'Lenh giao dich',
-        newTrade: 'Lenh moi'
+        trades: 'Lệnh giao dịch',
+        newTrade: 'Lệnh mới',
+        importTrades: 'Nhập lệnh'
       }
     }
   },
+
   trade: {
     nav: {
-      trades: 'Lenh giao dich'
+      trades: 'Lệnh giao dịch',
+      importTrades: 'Nhập lệnh'
     },
+
     range: {
       '1D': '1N',
       '7D': '7N',
       '30D': '30N'
     },
+
     dashboard: {
-      title: 'Bang dieu khien giao dich',
-      subtitle: 'Tong quan hieu suat',
+      title: 'Bảng điều khiển giao dịch',
+      subtitle: 'Tổng quan hiệu suất',
       description:
-        'So lieu duoc tinh tu danh sach lenh hien tai va loc theo thoi gian mo cua tung lenh.',
+        'Số liệu được tính từ danh sách lệnh hiện tại và lọc theo thời gian mở của từng lệnh.',
       cards: {
-        totalTrades: 'Tong so lenh',
-        openTrades: 'Lenh dang mo',
-        closedTrades: 'Lenh da dong',
-        mostTraded: 'Giao dich nhieu nhat',
-        estimatedPnl: 'Lai lo uoc tinh',
-        pnlNote: 'Duoc tinh tu {count} lenh co du gia vao, gia ra va khoi luong.'
+        totalTrades: 'Tổng số lệnh',
+        openTrades: 'Lệnh đang mở',
+        closedTrades: 'Lệnh đã đóng',
+        mostTraded: 'Giao dịch nhiều nhất',
+        estimatedPnl: 'Lãi/lỗ ước tính',
+        pnlNote: 'Được tính từ {count} lệnh có đủ giá vào, giá ra và khối lượng.'
       },
       charts: {
-        tradesOverTime: 'Lenh theo thoi gian',
-        tradesOverTimeDescription: 'Goc nhin frontend don gian ve so lenh theo ngay.',
-        symbolDistribution: 'Phan bo ma',
-        symbolDistributionDescription: 'Nhung ma giao dich nhieu nhat trong khoang da chon.',
-        sideDistribution: 'Phan bo chieu lenh',
-        sideDistributionDescription: 'Ty le mua va ban trong cac lenh da loc.',
-        noSymbolData: 'Khong co du lieu ma cho khoang nay.',
-        noSideData: 'Khong co du lieu chieu lenh cho khoang nay.'
+        tradesOverTime: 'Lệnh theo thời gian',
+        tradesOverTimeDescription: 'Thống kê số lệnh theo ngày (frontend).',
+        symbolDistribution: 'Phân bố mã',
+        symbolDistributionDescription: 'Những mã giao dịch nhiều nhất trong khoảng đã chọn.',
+        sideDistribution: 'Phân bố chiều lệnh',
+        sideDistributionDescription: 'Tỷ lệ mua và bán trong các lệnh đã lọc.',
+        noSymbolData: 'Không có dữ liệu mã trong khoảng này.',
+        noSideData: 'Không có dữ liệu chiều lệnh trong khoảng này.'
       }
     },
+
     list: {
-      title: 'Danh sach lenh',
-      description: 'Dinh dang de de doc trong khi van giu gia tri chuoi tu API.',
-      createTrade: 'Tao lenh',
-      loading: 'Dang tai lenh...',
-      emptyTitle: 'Chua co lenh nao',
-      emptyDescription: 'Tao lenh dau tien de bat dau xay dung nhat ky.',
-      deleteSubmitting: 'Dang xoa...',
-      deleteConfirm: 'Xoa lenh #{tradeNo} cua {symbol}?',
-      deleteError: 'Khong the xoa lenh luc nay.',
-      loadError: 'Khong the tai danh sach lenh luc nay.',
+      title: 'Danh sách lệnh',
+      description: 'Định dạng dễ đọc trong khi vẫn giữ dữ liệu gốc từ API.',
+      createTrade: 'Tạo lệnh',
+      loading: 'Đang tải lệnh...',
+      emptyTitle: 'Chưa có lệnh nào',
+      emptyDescription: 'Tạo lệnh đầu tiên để bắt đầu xây dựng nhật ký.',
+      deleteSubmitting: 'Đang xóa...',
+      deleteConfirm: 'Xóa lệnh #{tradeNo} của {symbol}?',
+      deleteError: 'Không thể xóa lệnh lúc này.',
+      loadError: 'Không thể tải danh sách lệnh lúc này.',
       fields: {
-        tradeNo: 'So lenh',
-        symbol: 'Ma',
-        sideStatus: 'Chieu / Trang thai',
-        entryQuantity: 'Gia vao / Khoi luong',
-        openTime: 'Thoi gian mo',
-        riskLevels: 'Muc rui ro',
-        exit: 'Gia ra',
-        lastUpdated: 'Cap nhat lan cuoi',
-        thesis: 'Luan diem',
-        note: 'Ghi chu',
+        tradeNo: 'Số lệnh',
+        symbol: 'Mã',
+        sideStatus: 'Chiều / Trạng thái',
+        entryQuantity: 'Giá vào / Khối lượng',
+        openTime: 'Thời gian mở',
+        riskLevels: 'Mức rủi ro',
+        exit: 'Giá ra',
+        lastUpdated: 'Cập nhật lần cuối',
+        thesis: 'Luận điểm',
+        note: 'Ghi chú',
         qty: 'KL',
-        stillOpen: 'Van dang mo / chua dat'
+        stillOpen: 'Vẫn đang mở / chưa đạt'
       },
       status: {
-        open: 'Dang mo',
-        closed: 'Da dong'
+        open: 'Đang mở',
+        closed: 'Đã đóng'
       },
       side: {
         buy: 'Mua',
-        sell: 'Ban'
+        sell: 'Bán'
       }
     },
+
     form: {
       fields: {
-        symbol: 'Ma',
-        marketType: 'Loai thi truong',
-        side: 'Chieu lenh',
-        openTime: 'Thoi gian mo',
-        entryPrice: 'Gia vao',
-        stopLoss: 'Cat lo',
-        takeProfit: 'Chot loi',
-        quantity: 'Khoi luong',
-        thesis: 'Luan diem',
-        note: 'Ghi chu'
+        symbol: 'Mã',
+        marketType: 'Loại thị trường',
+        side: 'Chiều lệnh',
+        openTime: 'Thời gian mở',
+        entryPrice: 'Giá vào',
+        stopLoss: 'Cắt lỗ',
+        takeProfit: 'Chốt lời',
+        quantity: 'Khối lượng',
+        thesis: 'Luận điểm',
+        note: 'Ghi chú'
       },
       placeholders: {
-        thesis: 'Pha vo vung khang cu kem xac nhan khoi luong',
-        note: 'Da dieu chinh muc chot loi sau khi dong luong duoc xac nhan'
+        thesis: 'Phá vỡ vùng kháng cự kèm xác nhận khối lượng',
+        note: 'Đã điều chỉnh mức chốt lời sau khi động lượng được xác nhận'
       },
       marketType: {
-        crypto: 'Tien dien tu',
-        forex: 'Ngoai hoi',
-        stock: 'Co phieu',
-        futures: 'Phai sinh'
+        crypto: 'Tiền điện tử',
+        forex: 'Ngoại hối',
+        stock: 'Cổ phiếu',
+        futures: 'Phái sinh'
       },
       side: {
         buy: 'Mua',
-        sell: 'Ban'
+        sell: 'Bán'
       }
     },
+
     create: {
-      title: 'Tao lenh',
+      title: 'Tạo lệnh',
       description:
-        'Ghi lai mot lenh moi bang cac truong giai doan 1 hien tai. Gia tri duoc giu dang chuoi de tuong thich API.',
-      submit: 'Luu lenh',
-      submitting: 'Dang luu lenh...',
-      error: 'Khong the tao lenh luc nay.'
+        'Ghi lại một lệnh mới với các trường hiện tại. Dữ liệu được giữ dạng chuỗi để tương thích với API.',
+      submit: 'Lưu lệnh',
+      submitting: 'Đang lưu lệnh...',
+      error: 'Không thể tạo lệnh lúc này.'
     },
+
     edit: {
-      title: 'Sua lenh',
-      description: 'Cap nhat cac truong giao dich giai doan 1 va gui yeu cau PATCH toi backend.',
-      loading: 'Dang tai lenh...',
-      submit: 'Cap nhat lenh',
-      submitting: 'Dang cap nhat lenh...',
-      missingId: 'Thieu trade id.',
-      loadError: 'Khong the tai lenh da chon.',
-      error: 'Khong the cap nhat lenh luc nay.'
+      title: 'Sửa lệnh',
+      description: 'Cập nhật thông tin giao dịch và gửi yêu cầu PATCH tới backend.',
+      loading: 'Đang tải lệnh...',
+      submit: 'Cập nhật lệnh',
+      submitting: 'Đang cập nhật lệnh...',
+      missingId: 'Thiếu trade id.',
+      loadError: 'Không thể tải lệnh đã chọn.',
+      error: 'Không thể cập nhật lệnh lúc này.'
+    },
+
+    import: {
+      title: 'Nhập lệnh',
+      description:
+        'Tải lên file HTML MT5, xem trước dữ liệu đã phân tích, sau đó xác nhận nhập vào hệ thống.',
+      sourceNote: 'Frontend chỉ gọi API preview/confirm, không tự parse file.',
+      uploadLabel: 'File báo cáo HTML MT5',
+      uploadHelp: 'Chọn file .html hoặc .htm xuất từ MT5.',
+      selectedFile: 'File đã chọn',
+      noFileSelected: 'Chưa chọn file.',
+      preview: 'Xem trước',
+      previewing: 'Đang xử lý...',
+      confirm: 'Xác nhận nhập',
+      confirming: 'Đang nhập...',
+      reset: 'Xóa',
+      previewRequired: 'Cần xem trước thành công trước khi xác nhận.',
+      previewSuccess: 'Đã tải dữ liệu xem trước.',
+      confirmSuccess: 'Nhập lệnh thành công.',
+      errorsTitle: 'Lỗi',
+      warningsTitle: 'Cảnh báo',
+      requestError: 'Không thể xử lý yêu cầu lúc này.',
+
+      metadata: {
+        title: 'Thông tin xem trước',
+        originalFilename: 'Tên file gốc',
+        accountNo: 'Số tài khoản',
+        accountName: 'Tên tài khoản',
+        brokerName: 'Tên broker',
+        brokerServer: 'Máy chủ broker',
+        reportDate: 'Ngày báo cáo',
+        totalRows: 'Tổng số dòng',
+        parsedRows: 'Dòng đã phân tích',
+        skippedRows: 'Dòng bị bỏ qua'
+      },
+
+      previewTable: {
+        title: 'Dữ liệu xem trước',
+        description: 'Các dòng này chưa được lưu vào hệ thống.',
+        empty: 'Không có dữ liệu.',
+        fields: {
+          externalPositionId: 'Mã vị thế',
+          externalOrderId: 'Mã lệnh',
+          symbol: 'Mã',
+          side: 'Chiều',
+          quantity: 'Khối lượng',
+          entryPrice: 'Giá vào',
+          stopLoss: 'Cắt lỗ',
+          takeProfit: 'Chốt lời',
+          openTime: 'Thời gian mở',
+          exitPrice: 'Giá ra',
+          closeTime: 'Thời gian đóng',
+          commission: 'Commission',
+          swap: 'Swap',
+          fee: 'Phí',
+          profit: 'Lãi/lỗ',
+          closeReason: 'Lý do đóng',
+          rawComment: 'Ghi chú gốc'
+        }
+      },
+
+      confirmSummary: {
+        title: 'Tóm tắt nhập',
+        importBatchId: 'Batch ID',
+        totalRows: 'Tổng số dòng',
+        importedRows: 'Đã nhập',
+        skippedRows: 'Bỏ qua'
+      },
+
+      closeReason: {
+        tp: 'Chốt lời',
+        sl: 'Cắt lỗ',
+        unknown: 'Không rõ'
+      }
     }
   }
 };

@@ -70,14 +70,16 @@ export const enTranslations: TranslationDictionary = {
       logoutSubmitting: 'Signing out...',
       logoutError: 'Unable to sign out right now.',
       nav: {
-        trades: 'View',
-        newTrade: 'Create'
+        trades: 'Trades',
+        newTrade: 'New Trade',
+        importTrades: 'Import Trades'
       }
     }
   },
   trade: {
     nav: {
-      trades: 'Trades'
+      trades: 'Trades',
+      importTrades: 'Import Trades'
     },
     range: {
       '1D': '1D',
@@ -187,6 +189,75 @@ export const enTranslations: TranslationDictionary = {
       missingId: 'Trade id is missing.',
       loadError: 'Unable to load the selected trade.',
       error: 'Unable to update the trade right now.'
+    },
+    import: {
+      title: 'Import Trades',
+      description:
+        'Upload an MT5 HTML report, inspect the parsed preview, then confirm the import with the backend.',
+      sourceNote: 'Phase-1 import uses backend preview and confirm endpoints with no frontend-side parsing.',
+      uploadLabel: 'MT5 HTML report file',
+      uploadHelp: 'Select one .html or .htm report exported from MT5.',
+      selectedFile: 'Selected file',
+      noFileSelected: 'No file selected yet.',
+      preview: 'Preview Import',
+      previewing: 'Previewing...',
+      confirm: 'Confirm Import',
+      confirming: 'Importing...',
+      reset: 'Clear',
+      previewRequired: 'Preview the selected file successfully before confirming import.',
+      previewSuccess: 'Preview loaded successfully. Review the parsed rows before confirming.',
+      confirmSuccess: 'Import completed successfully.',
+      errorsTitle: 'Errors',
+      warningsTitle: 'Warnings',
+      requestError: 'Unable to process the import request right now.',
+      metadata: {
+        title: 'Preview Metadata',
+        originalFilename: 'Original filename',
+        accountNo: 'Account No',
+        accountName: 'Account Name',
+        brokerName: 'Broker Name',
+        brokerServer: 'Broker Server',
+        reportDate: 'Report Date',
+        totalRows: 'Total Rows',
+        parsedRows: 'Parsed Rows',
+        skippedRows: 'Skipped Rows'
+      },
+      previewTable: {
+        title: 'Preview Trades',
+        description: 'These rows come from the backend parser and have not been saved yet.',
+        empty: 'No preview trade rows were returned.',
+        fields: {
+          externalPositionId: 'External Position ID',
+          externalOrderId: 'External Order ID',
+          symbol: 'Symbol',
+          side: 'Side',
+          quantity: 'Quantity',
+          entryPrice: 'Entry Price',
+          stopLoss: 'Stop Loss',
+          takeProfit: 'Take Profit',
+          openTime: 'Open Time',
+          exitPrice: 'Exit Price',
+          closeTime: 'Close Time',
+          commission: 'Commission',
+          swap: 'Swap',
+          fee: 'Fee',
+          profit: 'Profit',
+          closeReason: 'Close Reason',
+          rawComment: 'Raw Comment'
+        }
+      },
+      confirmSummary: {
+        title: 'Import Summary',
+        importBatchId: 'Import Batch ID',
+        totalRows: 'Total Rows',
+        importedRows: 'Imported Rows',
+        skippedRows: 'Skipped Rows'
+      },
+      closeReason: {
+        tp: 'Take Profit',
+        sl: 'Stop Loss',
+        unknown: 'Unknown'
+      }
     }
   }
 };
