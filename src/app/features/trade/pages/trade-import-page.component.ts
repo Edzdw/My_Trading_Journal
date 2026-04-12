@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
-import { Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { I18nService } from '../../../core/services/i18n.service';
@@ -190,11 +190,28 @@ import {
         </div>
 
         <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-          <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('trade.import.previewTable.title') }}</h3>
               <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('trade.import.previewTable.description') }}</p>
             </div>
+
+            @if (preview.trades.length > 0) {
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="text-sm text-slate-500 dark:text-slate-400">
+                  Rows per page
+                </label>
+                <select
+                  class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                  [value]="pageSize()"
+                  (change)="onPageSizeChange($event)">
+                  <option [value]="10">10</option>
+                  <option [value]="20">20</option>
+                  <option [value]="50">50</option>
+                  <option [value]="100">100</option>
+                </select>
+              </div>
+            }
           </div>
 
           @if (preview.trades.length === 0) {
@@ -214,7 +231,7 @@ import {
                   </tr>
                 </thead>
                 <tbody>
-                  @for (trade of preview.trades; track trackTradeRow($index, trade)) {
+                  @for (trade of paginatedTrades(); track trackTradeRow($index + ((currentPage() - 1) * pageSize()), trade)) {
                     <tr class="align-top">
                       <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm font-medium text-slate-900 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-100">{{ trade.externalPositionId }}</td>
                       <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ trade.symbol }}</td>
@@ -245,6 +262,45 @@ import {
                   }
                 </tbody>
               </table>
+            </div>
+
+            <div class="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 md:flex-row md:items-center md:justify-between dark:border-slate-800">
+              <p class="text-sm text-slate-500 dark:text-slate-400">
+                Showing
+                <span class="font-semibold text-slate-900 dark:text-slate-100">
+                  {{ startRow() }}
+                </span>
+                -
+                <span class="font-semibold text-slate-900 dark:text-slate-100">
+                  {{ endRow() }}
+                </span>
+                of
+                <span class="font-semibold text-slate-900 dark:text-slate-100">
+                  {{ totalPreviewTrades() }}
+                </span>
+              </p>
+
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  [disabled]="currentPage() === 1"
+                  (click)="goToPreviousPage()">
+                  Previous
+                </button>
+
+                <span class="px-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Page {{ currentPage() }} / {{ totalPages() }}
+                </span>
+
+                <button
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  [disabled]="currentPage() === totalPages()"
+                  (click)="goToNextPage()">
+                  Next
+                </button>
+              </div>
             </div>
           }
         </section>
@@ -307,6 +363,31 @@ export class TradeImportPageComponent {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly successMessage = signal<string | null>(null);
 
+  protected readonly pageSize = signal(10);
+  protected readonly currentPage = signal(1);
+
+  protected readonly totalPreviewTrades = computed(() => this.previewResponse()?.trades.length ?? 0);
+
+  protected readonly totalPages = computed(() => {
+    const total = this.totalPreviewTrades();
+    const size = this.pageSize();
+    return total > 0 ? Math.ceil(total / size) : 1;
+  });
+
+  protected readonly paginatedTrades = computed(() => {
+    const preview = this.previewResponse();
+    if (!preview) {
+      return [];
+    }
+
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    const end = start + size;
+
+    return preview.trades.slice(start, end);
+  });
+
   protected readonly previewColumns = [
     { key: 'externalPositionId', labelKey: 'trade.import.previewTable.fields.externalPositionId' },
     { key: 'symbol', labelKey: 'trade.import.previewTable.fields.symbol' },
@@ -337,6 +418,7 @@ export class TradeImportPageComponent {
     this.confirmResponse.set(null);
     this.errorMessage.set(null);
     this.successMessage.set(null);
+    this.currentPage.set(1);
   }
 
   protected previewImport(): void {
@@ -357,6 +439,7 @@ export class TradeImportPageComponent {
       .subscribe({
         next: (response) => {
           this.previewResponse.set(response);
+          this.currentPage.set(1);
           this.successMessage.set(this.i18n.t('trade.import.previewSuccess'));
           this.isPreviewing.set(false);
         },
@@ -401,11 +484,48 @@ export class TradeImportPageComponent {
     this.confirmResponse.set(null);
     this.errorMessage.set(null);
     this.successMessage.set(null);
+    this.currentPage.set(1);
     this.fileInputRef().nativeElement.value = '';
   }
 
   protected canConfirmImport(): boolean {
     return !!this.selectedFile() && !!this.previewResponse() && !this.isPreviewing() && !this.isConfirming();
+  }
+
+  protected goToPreviousPage(): void {
+    const current = this.currentPage();
+    if (current > 1) {
+      this.currentPage.set(current - 1);
+    }
+  }
+
+  protected goToNextPage(): void {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    if (current < total) {
+      this.currentPage.set(current + 1);
+    }
+  }
+
+  protected onPageSizeChange(event: Event): void {
+    const value = Number((event.target as HTMLSelectElement).value);
+    if (!Number.isNaN(value) && value > 0) {
+      this.pageSize.set(value);
+      this.currentPage.set(1);
+    }
+  }
+
+  protected startRow(): number {
+    const total = this.totalPreviewTrades();
+    if (total === 0) {
+      return 0;
+    }
+
+    return (this.currentPage() - 1) * this.pageSize() + 1;
+  }
+
+  protected endRow(): number {
+    return Math.min(this.currentPage() * this.pageSize(), this.totalPreviewTrades());
   }
 
   protected trackTradeRow(index: number, trade: TradeImportPreviewTradeRow): string {
@@ -435,7 +555,7 @@ export class TradeImportPageComponent {
   }
 
   protected formatSideLabel(side: string): string {
-    const key = `trade.list.side.${side.toLowerCase()}`;
+    const key = \`trade.list.side.\${side.toLowerCase()}\`;
     const translated = this.i18n.t(key);
     return translated === key ? side : translated;
   }
@@ -445,7 +565,7 @@ export class TradeImportPageComponent {
       return this.i18n.t('common.states.notAvailable');
     }
 
-    const key = `trade.import.closeReason.${closeReason.toLowerCase()}`;
+    const key = \`trade.import.closeReason.\${closeReason.toLowerCase()}\`;
     const translated = this.i18n.t(key);
     return translated === key ? closeReason : translated;
   }
