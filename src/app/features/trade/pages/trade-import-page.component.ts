@@ -529,7 +529,7 @@ export class TradeImportPageComponent {
   }
 
   protected trackTradeRow(index: number, trade: TradeImportPreviewTradeRow): string {
-    return `${trade.externalPositionId}-${trade.externalOrderId ?? 'no-order'}-${index}`;
+    return (trade.externalPositionId ?? 'no-position') + '-' + (trade.externalOrderId ?? 'no-order') + '-' + index;
   }
 
   protected formatNumber(value: string | null): string {
@@ -555,7 +555,7 @@ export class TradeImportPageComponent {
   }
 
   protected formatSideLabel(side: string): string {
-    const key = \`trade.list.side.\${side.toLowerCase()}\`;
+    const key = 'trade.list.side.' + side.toLowerCase();
     const translated = this.i18n.t(key);
     return translated === key ? side : translated;
   }
@@ -565,7 +565,7 @@ export class TradeImportPageComponent {
       return this.i18n.t('common.states.notAvailable');
     }
 
-    const key = \`trade.import.closeReason.\${closeReason.toLowerCase()}\`;
+    const key = 'trade.import.closeReason.' + closeReason.toLowerCase();
     const translated = this.i18n.t(key);
     return translated === key ? closeReason : translated;
   }
