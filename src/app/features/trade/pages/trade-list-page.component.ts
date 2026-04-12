@@ -38,7 +38,7 @@ import {
                 type="button"
                 class="rounded-full px-4 py-2 transition"
                 [ngClass]="selectedRange() === range ? 'bg-white text-slate-950 shadow-sm' : 'hover:text-slate-900'"
-                (click)="selectedRange.set(range)">
+                (click)="onRangeChange(range)">
                 {{ i18n.t('trade.range.' + range) }}
               </button>
             }
@@ -172,14 +172,38 @@ import {
         <div class="rounded-3xl border border-slate-200 bg-white/70 p-8 text-sm text-slate-500">
           {{ i18n.t('trade.list.loading') }}
         </div>
-      } @else if (trades().length === 0) {
+      } @else if (filteredTrades().length === 0) {
         <div class="rounded-3xl border border-dashed border-slate-300 bg-white/60 p-8 text-center">
           <h3 class="text-lg font-semibold text-slate-900">{{ i18n.t('trade.list.emptyTitle') }}</h3>
           <p class="mt-2 text-sm text-slate-500">{{ i18n.t('trade.list.emptyDescription') }}</p>
         </div>
       } @else {
         <div class="space-y-4">
-          @for (trade of trades(); track trade.tradeId) {
+          <div class="flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white/75 p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+            <p class="text-sm text-slate-500">
+              Showing
+              <span class="font-semibold text-slate-900">{{ startRow() }}</span>
+              -
+              <span class="font-semibold text-slate-900">{{ endRow() }}</span>
+              of
+              <span class="font-semibold text-slate-900">{{ totalFilteredTrades() }}</span>
+            </p>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <label class="text-sm text-slate-500">Rows per page</label>
+              <select
+                class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500"
+                [value]="pageSize()"
+                (change)="onPageSizeChange($event)">
+                <option [value]="5">5</option>
+                <option [value]="10">10</option>
+                <option [value]="20">20</option>
+                <option [value]="50">50</option>
+              </select>
+            </div>
+          </div>
+
+          @for (trade of paginatedTrades(); track trade.tradeId) {
             <article class="rounded-3xl border border-slate-200 bg-white/75 p-5 shadow-sm">
               <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                 <div class="grid flex-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
@@ -277,6 +301,33 @@ import {
               }
             </article>
           }
+
+          <div class="flex flex-col gap-3 rounded-[2rem] border border-slate-200 bg-white/75 p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+            <p class="text-sm text-slate-500">
+              Page
+              <span class="font-semibold text-slate-900">{{ currentPage() }}</span>
+              /
+              <span class="font-semibold text-slate-900">{{ totalPages() }}</span>
+            </p>
+
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="currentPage() === 1"
+                (click)="goToPreviousPage()">
+                Previous
+              </button>
+
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="currentPage() === totalPages()"
+                (click)="goToNextPage()">
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       }
     </section>
@@ -296,9 +347,31 @@ export class TradeListPageComponent {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly deletingTradeId = signal<string | null>(null);
 
+  protected readonly pageSize = signal(10);
+  protected readonly currentPage = signal(1);
+
   protected readonly filteredTrades = computed(() =>
     filterTradesByRange(this.trades(), this.selectedRange())
   );
+
+  protected readonly totalFilteredTrades = computed(() => this.filteredTrades().length);
+
+  protected readonly totalPages = computed(() => {
+    const total = this.totalFilteredTrades();
+    const size = this.pageSize();
+    return total > 0 ? Math.ceil(total / size) : 1;
+  });
+
+  protected readonly paginatedTrades = computed(() => {
+    const trades = this.filteredTrades();
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    const end = start + size;
+
+    return trades.slice(start, end);
+  });
+
   protected readonly analytics = computed(() => computeTradeAnalytics(this.filteredTrades()));
   protected readonly tradesOverTime = computed(() =>
     buildTradesOverTime(this.filteredTrades(), this.selectedRange())
@@ -308,6 +381,47 @@ export class TradeListPageComponent {
 
   constructor() {
     this.loadTrades();
+  }
+
+  protected onRangeChange(range: TradeRangeKey): void {
+    this.selectedRange.set(range);
+    this.currentPage.set(1);
+  }
+
+  protected onPageSizeChange(event: Event): void {
+    const value = Number((event.target as HTMLSelectElement).value);
+    if (!Number.isNaN(value) && value > 0) {
+      this.pageSize.set(value);
+      this.currentPage.set(1);
+    }
+  }
+
+  protected goToPreviousPage(): void {
+    const current = this.currentPage();
+    if (current > 1) {
+      this.currentPage.set(current - 1);
+    }
+  }
+
+  protected goToNextPage(): void {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    if (current < total) {
+      this.currentPage.set(current + 1);
+    }
+  }
+
+  protected startRow(): number {
+    const total = this.totalFilteredTrades();
+    if (total === 0) {
+      return 0;
+    }
+
+    return (this.currentPage() - 1) * this.pageSize() + 1;
+  }
+
+  protected endRow(): number {
+    return Math.min(this.currentPage() * this.pageSize(), this.totalFilteredTrades());
   }
 
   protected deleteTrade(trade: Trade): void {
@@ -330,6 +444,16 @@ export class TradeListPageComponent {
       .subscribe({
         next: () => {
           this.trades.update((trades) => trades.filter((item) => item.tradeId !== trade.tradeId));
+
+          const totalAfterDelete = this.filteredTrades().length - 1;
+          const maxPageAfterDelete = totalAfterDelete > 0
+            ? Math.ceil(totalAfterDelete / this.pageSize())
+            : 1;
+
+          if (this.currentPage() > maxPageAfterDelete) {
+            this.currentPage.set(maxPageAfterDelete);
+          }
+
           this.deletingTradeId.set(null);
         },
         error: (error) => {
@@ -371,19 +495,19 @@ export class TradeListPageComponent {
   }
 
   protected formatMarketTypeLabel(marketType: string): string {
-    const key = `trade.form.marketType.${marketType.toLowerCase()}`;
+    const key = 'trade.form.marketType.' + marketType.toLowerCase();
     const translated = this.i18n.t(key);
     return translated === key ? marketType : translated;
   }
 
   protected formatSideLabel(side: string): string {
-    const key = `trade.list.side.${side.toLowerCase()}`;
+    const key = 'trade.list.side.' + side.toLowerCase();
     const translated = this.i18n.t(key);
     return translated === key ? side : translated;
   }
 
   protected formatStatusLabel(status: string): string {
-    const key = `trade.list.status.${status.toLowerCase()}`;
+    const key = 'trade.list.status.' + status.toLowerCase();
     const translated = this.i18n.t(key);
     return translated === key ? status : translated;
   }
@@ -395,6 +519,7 @@ export class TradeListPageComponent {
       .subscribe({
         next: (trades) => {
           this.trades.set(trades);
+          this.currentPage.set(1);
           this.isLoading.set(false);
         },
         error: (error) => {
