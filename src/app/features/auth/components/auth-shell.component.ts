@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { I18nService } from '../../../core/services/i18n.service';
 import { ThemeService } from '../../../core/services/theme.service';
-import { LanguageSwitcherComponent } from '../../../shared/components/language-switcher.component';
+import { LanguageSwitcherComponent } from '../../../shared/components/app-language-switcher/app-language-switcher.component';
 
 @Component({
   selector: 'app-auth-shell',

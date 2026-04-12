@@ -1,0 +1,27 @@
+<div class="hidden items-center gap-2 lg:flex">
+  <span class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+    Lang
+  </span>
+
+  <div class="flex items-center rounded-2xl border border-white/10 bg-white/[0.05] p-1 backdrop-blur">
+    <button
+      type="button"
+      class="rounded-xl px-3 py-1.5 text-sm font-medium transition"
+      [ngClass]="currentLanguage === 'en'
+        ? 'bg-white text-slate-950 shadow-sm'
+        : 'text-slate-300 hover:bg-white/[0.06] hover:text-white'"
+      (click)="setLanguage('en')">
+      EN
+    </button>
+
+    <button
+      type="button"
+      class="rounded-xl px-3 py-1.5 text-sm font-medium transition"
+      [ngClass]="currentLanguage === 'vi'
+        ? 'bg-white text-slate-950 shadow-sm'
+        : 'text-slate-300 hover:bg-white/[0.06] hover:text-white'"
+      (click)="setLanguage('vi')">
+      VI
+    </button>
+  </div>
+</div>

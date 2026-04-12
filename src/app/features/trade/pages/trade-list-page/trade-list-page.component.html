@@ -1,0 +1,182 @@
+<section class="space-y-6">
+  <div>
+    <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-300">
+      {{ i18n.t('trade.nav.trades') }}
+    </p>
+    <h2 class="mt-2 text-3xl font-semibold text-white">
+      {{ i18n.t('trade.list.title') }}
+    </h2>
+    <p class="mt-2 text-sm text-slate-400">
+      {{ i18n.t('trade.list.description') }}
+    </p>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="rounded-[28px] border border-white/10 bg-white/[0.05] p-8 text-sm text-slate-300 backdrop-blur-xl">
+      {{ i18n.t('trade.list.loading') }}
+    </div>
+  } @else if (filteredTrades().length === 0) {
+    <div class="rounded-[28px] border border-white/10 bg-white/[0.05] p-8 text-center backdrop-blur-xl">
+      <h3 class="text-lg font-semibold text-white">{{ i18n.t('trade.list.emptyTitle') }}</h3>
+      <p class="mt-2 text-sm text-slate-400">{{ i18n.t('trade.list.emptyDescription') }}</p>
+    </div>
+  } @else {
+    <div class="space-y-4">
+      <div class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl md:flex-row md:items-center md:justify-between">
+        <p class="text-sm text-slate-400">
+          Showing
+          <span class="font-semibold text-white">{{ startRow() }}</span>
+          -
+          <span class="font-semibold text-white">{{ endRow() }}</span>
+          of
+          <span class="font-semibold text-white">{{ totalFilteredTrades() }}</span>
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="text-sm text-slate-400">Rows per page</label>
+          <select
+            class="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-slate-200 outline-none transition focus:border-blue-400"
+            [value]="pageSize()"
+            (change)="onPageSizeChange($event)">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
+      </div>
+
+      @for (trade of paginatedTrades(); track trade.tradeId) {
+        <article class="rounded-[28px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl">
+          <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+            <div class="grid flex-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.tradeNo') }}</p>
+                <p class="mt-2 text-lg font-semibold text-white">#{{ trade.tradeNo }}</p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.symbol') }}</p>
+                <p class="mt-2 text-lg font-semibold text-white">{{ trade.symbol }}</p>
+                <p class="text-sm text-slate-400">{{ formatMarketTypeLabel(trade.marketType) }}</p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.sideStatus') }}</p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <span
+                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                    [ngClass]="trade.side === 'BUY' ? 'bg-emerald-400/15 text-emerald-200' : 'bg-rose-400/15 text-rose-200'">
+                    {{ formatSideLabel(trade.side) }}
+                  </span>
+                  <span
+                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                    [ngClass]="trade.status === 'OPEN' ? 'bg-amber-400/15 text-amber-200' : 'bg-sky-400/15 text-sky-200'">
+                    {{ formatStatusLabel(trade.status) }}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.entryQuantity') }}</p>
+                <p class="mt-2 text-base font-semibold text-white">{{ formatNumber(trade.entryPrice) }}</p>
+                <p class="text-sm text-slate-400">{{ i18n.t('trade.list.fields.qty') }} {{ formatNumber(trade.quantity) }}</p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.openTime') }}</p>
+                <p class="mt-2 text-base font-semibold text-white">{{ trade.openTime | date: 'medium' }}</p>
+              </div>
+            </div>
+
+            <div class="flex gap-2 xl:ml-6">
+              <a
+                [routerLink]="['/app/trades', trade.tradeId, 'edit']"
+                class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.08]">
+                {{ i18n.t('common.actions.edit') }}
+              </a>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2.5 text-sm font-semibold text-rose-200 transition hover:bg-rose-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="deletingTradeId() === trade.tradeId"
+                (click)="deleteTrade(trade)">
+                {{ deletingTradeId() === trade.tradeId ? i18n.t('trade.list.deleteSubmitting') : i18n.t('common.actions.delete') }}
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-5 grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.riskLevels') }}</p>
+              <p class="mt-2 text-sm text-slate-300">SL {{ formatNumber(trade.stopLoss) }}</p>
+              <p class="mt-1 text-sm text-slate-300">TP {{ formatNumber(trade.takeProfit) }}</p>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.exit') }}</p>
+              <p class="mt-2 text-sm text-slate-300">
+                {{ trade.exitPrice ? formatNumber(trade.exitPrice) : i18n.t('trade.list.fields.stillOpen') }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.lastUpdated') }}</p>
+              <p class="mt-2 text-sm text-slate-300">{{ trade.updatedAt | date: 'medium' }}</p>
+            </div>
+          </div>
+
+          @if (trade.thesis || trade.note) {
+            <div class="mt-4 grid gap-4 md:grid-cols-2">
+              @if (trade.thesis) {
+                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.thesis') }}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-300">{{ trade.thesis }}</p>
+                </div>
+              }
+
+              @if (trade.note) {
+                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.note') }}</p>
+                  <p class="mt-2 text-sm leading-6 text-slate-300">{{ trade.note }}</p>
+                </div>
+              }
+            </div>
+          }
+        </article>
+      }
+
+      <div class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl md:flex-row md:items-center md:justify-between">
+        <p class="text-sm text-slate-400">
+          Page
+          <span class="font-semibold text-white">{{ currentPage() }}</span>
+          /
+          <span class="font-semibold text-white">{{ totalPages() }}</span>
+        </p>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="currentPage() === 1"
+            (click)="goToPreviousPage()">
+            Previous
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="currentPage() === totalPages()"
+            (click)="goToNextPage()">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

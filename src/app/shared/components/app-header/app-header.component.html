@@ -1,0 +1,68 @@
+<header class="px-4 pt-4">
+  <div class="mx-auto flex h-[76px] items-center justify-between rounded-[28px] border border-white/10 bg-white/[0.06] px-6 shadow-[0_10px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+    <div class="flex items-center gap-4">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-gradient-to-br from-blue-500/80 to-cyan-400/70 text-sm font-bold text-white shadow-[0_8px_30px_rgba(59,130,246,0.35)]">
+        TJ
+      </div>
+
+      <div>
+        <p class="text-[11px] font-semibold uppercase tracking-[0.32em] text-blue-300/90">
+          {{ i18n.t('common.appName') }}
+        </p>
+        <h1 class="text-lg font-semibold text-white/95">
+          Trade Journal Workspace
+        </h1>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="hidden rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 backdrop-blur xl:block">
+        <app-language-switcher />
+      </div>
+
+      <!-- <button
+        type="button"
+        class="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/[0.09]"
+        (click)="themeService.toggleTheme()">
+        {{
+          themeService.isDarkMode()
+            ? i18n.t('common.themes.lightMode')
+            : i18n.t('common.themes.darkMode')
+        }}
+      </button> -->
+
+      <div class="hidden items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 backdrop-blur lg:flex">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/90 text-sm font-semibold text-slate-950">
+          {{ authService.currentUserInitial() }}
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+            {{ i18n.t('auth.protected.signedInAs') }}
+          </p>
+          <p class="truncate text-sm font-medium text-white/95">
+            {{ authService.currentUserEmail() ?? i18n.t('auth.protected.currentUser') }}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(56,189,248,0.25)] transition hover:scale-[1.02] hover:from-blue-400 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="isSubmitting()"
+        (click)="logout()">
+        {{
+          isSubmitting()
+            ? i18n.t('auth.protected.logoutSubmitting')
+            : i18n.t('common.actions.logout')
+        }}
+      </button>
+    </div>
+  </div>
+
+  @if (submitError()) {
+    <div class="mx-auto mt-3 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur">
+      {{ submitError() }}
+    </div>
+  }
+</header>
