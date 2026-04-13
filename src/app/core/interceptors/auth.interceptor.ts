@@ -20,13 +20,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     : req;
 
   return next(clonedReq).pipe(
-    catchError((error) => {
-      if (error.status === 401) {
-        authService.logout().subscribe(); // clear cả BE nếu cần
-        router.navigate(['/login']);
-      }
+  catchError((error) => {
+    if (error.status === 401) {
+      authService.handleUnauthorized(); // ✅ đúng
 
-      return throwError(() => error);
-    })
-  );
+      if (!router.url.startsWith('/login')) {
+        void router.navigate(['/login']);
+      }
+    }
+
+    return throwError(() => error);
+  })
+);
 };
