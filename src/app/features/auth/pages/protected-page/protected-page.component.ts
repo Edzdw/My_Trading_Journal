@@ -1,12 +1,4 @@
-import {
-  Component,
-  DestroyRef,
-  OnInit,
-  inject,
-  signal,
-  computed,
-  effect
-} from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterOutlet, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
@@ -21,17 +13,18 @@ import { ToastService } from '../../../../core/services/toast.service';
   selector: 'app-protected-page',
   standalone: true,
   imports: [RouterOutlet, AppHeaderComponent, AppSidebarComponent],
-  templateUrl: './protected-page.component.html'
+  templateUrl: './protected-page.component.html',
 })
 export class ProtectedPageComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
-   private readonly toastService = inject(ToastService);
-   private readonly route = inject(ActivatedRoute);
+  private readonly toastService = inject(ToastService);
+  private readonly route = inject(ActivatedRoute);
   private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
 
-  desktopSidebarCollapsed = signal(false);
+  // mặc định sidebar desktop là thu gọn
+  desktopSidebarCollapsed = signal(true);
   desktopSidebarTemporaryExpanded = signal(false);
   mobileSidebarOpen = signal(false);
 
@@ -42,12 +35,13 @@ export class ProtectedPageComponent implements OnInit {
   constructor() {
     this.router.events
       .pipe(
-        filter(event => event instanceof NavigationEnd),
-        takeUntilDestroyed(this.destroyRef)
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
         this.mobileSidebarOpen.set(false);
 
+        // nếu đang là expanded tạm thời thì sau khi chuyển route sẽ thu lại
         if (this.desktopSidebarTemporaryExpanded()) {
           this.desktopSidebarTemporaryExpanded.set(false);
         }
@@ -67,8 +61,15 @@ export class ProtectedPageComponent implements OnInit {
   }
 
   toggleDesktopSidebar(): void {
-    const nextCollapsed = !this.desktopSidebarCollapsed();
-    this.desktopSidebarCollapsed.set(nextCollapsed);
+    if (this.desktopSidebarExpanded()) {
+      // nếu hiện đang mở (kể cả mở tạm), thì đóng luôn
+      this.desktopSidebarCollapsed.set(true);
+      this.desktopSidebarTemporaryExpanded.set(false);
+      return;
+    }
+
+    // nếu hiện đang đóng, thì mở cố định
+    this.desktopSidebarCollapsed.set(false);
     this.desktopSidebarTemporaryExpanded.set(false);
   }
 
@@ -78,14 +79,14 @@ export class ProtectedPageComponent implements OnInit {
     }
   }
 
-  closeDesktopTemporarySidebar(): void {
+  collapseDesktopSidebarAfterNavigate(): void {
     if (this.desktopSidebarCollapsed()) {
       this.desktopSidebarTemporaryExpanded.set(false);
     }
   }
 
   toggleMobileSidebar(): void {
-    this.mobileSidebarOpen.update(v => !v);
+    this.mobileSidebarOpen.update((v) => !v);
   }
 
   closeMobileSidebar(): void {
@@ -93,28 +94,20 @@ export class ProtectedPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  // load user
-  this.authService
-    .loadCurrentUserProfile()
-    .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe();
+    this.authService.loadCurrentUserProfile().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
-  // 👇 xử lý toast
-  this.route.queryParamMap
-    .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe((params) => {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const toast = params.get('toast');
 
       if (toast === 'login-success') {
         this.toastService.show('Đăng nhập thành công', 'success');
 
-        // clear query param để tránh reload lại bị spam toast
         void this.router.navigate([], {
           relativeTo: this.route,
           queryParams: {},
-          replaceUrl: true
+          replaceUrl: true,
         });
       }
     });
-}
+  }
 }

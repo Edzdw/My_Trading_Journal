@@ -2,9 +2,15 @@
   class="relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(168,85,247,0.14),_transparent_24%),linear-gradient(135deg,_#020617_0%,_#0f172a_45%,_#111827_100%)] text-slate-100"
 >
   <div class="pointer-events-none absolute inset-0 overflow-hidden">
-    <div class="absolute left-[-120px] top-[-120px] h-72 w-72 rounded-full bg-blue-500/10 blur-3xl"></div>
-    <div class="absolute right-[-80px] top-[80px] h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl"></div>
-    <div class="absolute bottom-[-120px] left-[20%] h-80 w-80 rounded-full bg-fuchsia-500/10 blur-3xl"></div>
+    <div
+      class="absolute left-[-120px] top-[-120px] h-72 w-72 rounded-full bg-blue-500/10 blur-3xl"
+    ></div>
+    <div
+      class="absolute right-[-80px] top-[80px] h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl"
+    ></div>
+    <div
+      class="absolute bottom-[-120px] left-[20%] h-80 w-80 rounded-full bg-fuchsia-500/10 blur-3xl"
+    ></div>
   </div>
 
   <div class="relative z-10 flex min-h-screen flex-col">
@@ -12,36 +18,34 @@
       [mobileSidebarOpen]="mobileSidebarOpen()"
       [desktopSidebarCollapsed]="desktopSidebarCollapsed()"
       (menuClick)="toggleMobileSidebar()"
-      (desktopToggleClick)="toggleDesktopSidebar()"
     />
 
-    <div class="flex flex-1 gap-3 p-3 sm:gap-4 sm:p-4">
-      <!-- Desktop sidebar -->
+    <div class="flex min-w-0 flex-1 gap-3 p-3 sm:gap-4 sm:p-4">
       <aside
         class="hidden xl:block shrink-0 transition-all duration-300 ease-out"
-          [class.w-72]="desktopSidebarExpanded()"
-          [class.w-24]="!desktopSidebarExpanded()"
+        [class.w-72]="desktopSidebarExpanded()"
+        [class.w-24]="!desktopSidebarExpanded()"
       >
         <app-sidebar
           [collapsed]="!desktopSidebarExpanded()"
           [desktopCollapsedBase]="desktopSidebarCollapsed()"
           [mobile]="false"
           (requestTemporaryExpand)="expandDesktopSidebarTemporarily()"
+          (toggleCollapse)="toggleDesktopSidebar()"
+          (navigateItem)="collapseDesktopSidebarAfterNavigate()"
         />
       </aside>
 
-      <!-- Main -->
       <main
-        class="animate-app-page min-h-0 flex-1 rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl xl:rounded-[28px]"
+        class="animate-app-page min-h-0 min-w-0 flex-1 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl xl:rounded-[28px]"
       >
-        <div class="h-full overflow-auto p-3 sm:p-5 lg:p-6">
+        <div class="h-full min-w-0 overflow-y-auto overflow-x-hidden p-3 sm:p-5 lg:p-6">
           <router-outlet></router-outlet>
         </div>
       </main>
     </div>
   </div>
 
-  <!-- Mobile overlay -->
   <div
     class="fixed inset-0 z-40 bg-slate-950/45 backdrop-blur-sm transition-all duration-300 xl:hidden"
     [class.pointer-events-auto]="mobileSidebarOpen()"
@@ -51,16 +55,18 @@
     (click)="closeMobileSidebar()"
   ></div>
 
-  <!-- Mobile drawer -->
   <div
     class="fixed inset-y-0 left-0 z-50 w-[86%] max-w-[320px] p-3 transition-transform duration-300 ease-out xl:hidden"
     [class.translate-x-0]="mobileSidebarOpen()"
     [class.-translate-x-full]="!mobileSidebarOpen()"
   >
     <app-sidebar
-      [collapsed]="false"
+      [collapsed]="!desktopSidebarExpanded()"
+      [desktopCollapsedBase]="desktopSidebarCollapsed()"
       [mobile]="true"
-      (navigateItem)="closeMobileSidebar()"
+      (requestTemporaryExpand)="expandDesktopSidebarTemporarily()"
+      (toggleCollapse)="toggleDesktopSidebar()"
+      (navigateItem)="collapseDesktopSidebarAfterNavigate()"
     />
   </div>
 </div>

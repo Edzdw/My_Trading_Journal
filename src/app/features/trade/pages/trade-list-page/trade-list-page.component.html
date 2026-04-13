@@ -1,109 +1,184 @@
-<section class="space-y-6">
-  <div>
-    <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-300">
-      {{ i18n.t('trade.nav.trades') }}
-    </p>
-    <h2 class="mt-2 text-3xl font-semibold text-white">
-      {{ i18n.t('trade.list.title') }}
-    </h2>
-    <p class="mt-2 text-sm text-slate-400">
-      {{ i18n.t('trade.list.description') }}
-    </p>
+<section class="min-w-0 space-y-4 sm:space-y-6">
+  <div class="glass-panel animate-app-page rounded-[24px] p-4 sm:rounded-[28px] sm:p-5 lg:p-6">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div class="min-w-0">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300 sm:text-sm sm:tracking-[0.3em]">
+          {{ i18n.t('trade.nav.trades') }}
+        </p>
+        <h2 class="mt-2 text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-4xl">
+          {{ i18n.t('trade.list.title') }}
+        </h2>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+          {{ i18n.t('trade.list.description') }}
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+        <div class="glass-chip flex w-full flex-wrap gap-2 rounded-2xl p-1 text-sm font-medium text-slate-300 sm:w-auto sm:rounded-full">
+          @for (range of ranges; track range) {
+            <button
+              type="button"
+              class="min-w-0 flex-1 rounded-xl px-3 py-2 transition sm:flex-none sm:rounded-full sm:px-4"
+              [ngClass]="
+                selectedRange() === range
+                  ? 'glass-range-active'
+                  : 'hover:bg-white/[0.08] hover:text-white'
+              "
+              (click)="onRangeChange(range)">
+              {{ i18n.t('trade.range.' + range) }}
+            </button>
+          }
+        </div>
+
+        <a
+          routerLink="/app/trades/new"
+          class="glass-button inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.01] hover:from-blue-400 hover:to-cyan-300">
+          {{ i18n.t('trade.list.createTrade') }}
+        </a>
+      </div>
+    </div>
   </div>
 
   @if (errorMessage()) {
-    <div class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur">
+    <div class="glass-panel-soft rounded-2xl border border-red-400/20 px-4 py-3 text-sm text-red-200">
       {{ errorMessage() }}
     </div>
   }
 
   @if (isLoading()) {
-    <div class="rounded-[28px] border border-white/10 bg-white/[0.05] p-8 text-sm text-slate-300 backdrop-blur-xl">
+    <div class="glass-panel-soft rounded-[24px] p-5 text-sm text-slate-300 sm:rounded-[28px] sm:p-8">
       {{ i18n.t('trade.list.loading') }}
     </div>
   } @else if (filteredTrades().length === 0) {
-    <div class="rounded-[28px] border border-white/10 bg-white/[0.05] p-8 text-center backdrop-blur-xl">
-      <h3 class="text-lg font-semibold text-white">{{ i18n.t('trade.list.emptyTitle') }}</h3>
-      <p class="mt-2 text-sm text-slate-400">{{ i18n.t('trade.list.emptyDescription') }}</p>
+    <div class="glass-panel-soft rounded-[24px] p-6 text-center sm:rounded-[28px] sm:p-8">
+      <div class="mx-auto flex max-w-md flex-col items-center">
+        <div class="glass-chip rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
+          {{ i18n.t('trade.nav.trades') }}
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-white sm:text-xl">
+          {{ i18n.t('trade.list.emptyTitle') }}
+        </h3>
+        <p class="mt-2 text-sm leading-6 text-slate-400">
+          {{ i18n.t('trade.list.emptyDescription') }}
+        </p>
+        <a
+          routerLink="/app/trades/new"
+          class="glass-button mt-5 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.01] hover:from-blue-400 hover:to-cyan-300">
+          {{ i18n.t('trade.list.createTrade') }}
+        </a>
+      </div>
     </div>
   } @else {
-    <div class="space-y-4">
-      <div class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl md:flex-row md:items-center md:justify-between">
-        <p class="text-sm text-slate-400">
-          Showing
-          <span class="font-semibold text-white">{{ startRow() }}</span>
-          -
-          <span class="font-semibold text-white">{{ endRow() }}</span>
-          of
-          <span class="font-semibold text-white">{{ totalFilteredTrades() }}</span>
-        </p>
+    <div class="space-y-4 sm:space-y-5">
+      <div class="glass-panel-soft animate-stagger-1 rounded-[24px] p-4 sm:rounded-[28px] sm:p-5">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div class="glass-card glass-panel-soft rounded-[20px] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Visible Trades
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-white">
+                {{ totalFilteredTrades() }}
+              </p>
+            </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-          <label class="text-sm text-slate-400">Rows per page</label>
-          <select
-            class="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-slate-200 outline-none transition focus:border-blue-400"
-            [value]="pageSize()"
-            (change)="onPageSizeChange($event)">
-            <option [value]="5">5</option>
-            <option [value]="10">10</option>
-            <option [value]="20">20</option>
-            <option [value]="50">50</option>
-          </select>
+            <div class="glass-card glass-panel-soft rounded-[20px] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Open Trades
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-emerald-200">
+                {{ analytics().openTrades }}
+              </p>
+            </div>
+
+            <div class="glass-card glass-panel-soft rounded-[20px] p-4">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Closed Trades
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-blue-200">
+                {{ analytics().closedTrades }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+            <div class="glass-chip inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-sm text-slate-300">
+              <span>Showing</span>
+              <span class="font-semibold text-white">{{ startRow() }}</span>
+              <span>-</span>
+              <span class="font-semibold text-white">{{ endRow() }}</span>
+              <span>of</span>
+              <span class="font-semibold text-white">{{ totalFilteredTrades() }}</span>
+            </div>
+
+            <label class="glass-chip inline-flex items-center gap-3 rounded-2xl px-3 py-2 text-sm text-slate-300">
+              <span>Rows per page</span>
+              <select
+                class="glass-input rounded-xl px-3 py-2 text-sm text-slate-100 outline-none"
+                [value]="pageSize()"
+                (change)="onPageSizeChange($event)">
+                <option [value]="5" class="bg-slate-900 text-slate-100">5</option>
+                <option [value]="10" class="bg-slate-900 text-slate-100">10</option>
+                <option [value]="20" class="bg-slate-900 text-slate-100">20</option>
+                <option [value]="50" class="bg-slate-900 text-slate-100">50</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
 
       @for (trade of paginatedTrades(); track trade.tradeId) {
-        <article class="rounded-[28px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl">
+        <article class="glass-panel-soft glass-card animate-stagger-2 rounded-[24px] p-4 sm:rounded-[28px] sm:p-5">
           <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-            <div class="grid flex-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-              <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.tradeNo') }}</p>
+            <div class="grid flex-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <div class="rounded-[20px] bg-white/[0.03] p-4">
+                <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.tradeNo') }}</p>
                 <p class="mt-2 text-lg font-semibold text-white">#{{ trade.tradeNo }}</p>
               </div>
 
-              <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.symbol') }}</p>
+              <div class="rounded-[20px] bg-white/[0.03] p-4">
+                <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.symbol') }}</p>
                 <p class="mt-2 text-lg font-semibold text-white">{{ trade.symbol }}</p>
-                <p class="text-sm text-slate-400">{{ formatMarketTypeLabel(trade.marketType) }}</p>
+                <p class="mt-1 text-sm text-slate-300/85">{{ formatMarketTypeLabel(trade.marketType) }}</p>
               </div>
 
-              <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.sideStatus') }}</p>
-                <div class="mt-2 flex flex-wrap gap-2">
+              <div class="rounded-[20px] bg-white/[0.03] p-4">
+                <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.sideStatus') }}</p>
+                <div class="mt-3 flex flex-wrap gap-2">
                   <span
-                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-                    [ngClass]="trade.side === 'BUY' ? 'bg-emerald-400/15 text-emerald-200' : 'bg-rose-400/15 text-rose-200'">
+                    class="glass-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                    [ngClass]="trade.side === 'BUY' ? 'text-emerald-200' : 'text-rose-200'">
                     {{ formatSideLabel(trade.side) }}
                   </span>
                   <span
-                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-                    [ngClass]="trade.status === 'OPEN' ? 'bg-amber-400/15 text-amber-200' : 'bg-sky-400/15 text-sky-200'">
+                    class="glass-chip inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                    [ngClass]="trade.status === 'OPEN' ? 'text-amber-200' : 'text-sky-200'">
                     {{ formatStatusLabel(trade.status) }}
                   </span>
                 </div>
               </div>
 
-              <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.entryQuantity') }}</p>
+              <div class="rounded-[20px] bg-white/[0.03] p-4">
+                <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.entryQuantity') }}</p>
                 <p class="mt-2 text-base font-semibold text-white">{{ formatNumber(trade.entryPrice) }}</p>
-                <p class="text-sm text-slate-400">{{ i18n.t('trade.list.fields.qty') }} {{ formatNumber(trade.quantity) }}</p>
+                <p class="mt-1 text-sm text-slate-300/85">{{ i18n.t('trade.list.fields.qty') }} {{ formatNumber(trade.quantity) }}</p>
               </div>
 
-              <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.openTime') }}</p>
+              <div class="rounded-[20px] bg-white/[0.03] p-4">
+                <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.openTime') }}</p>
                 <p class="mt-2 text-base font-semibold text-white">{{ trade.openTime | date: 'medium' }}</p>
               </div>
             </div>
 
-            <div class="flex gap-2 xl:ml-6">
+            <div class="flex flex-wrap gap-2 xl:ml-6 xl:w-auto xl:flex-col">
               <a
                 [routerLink]="['/app/trades', trade.tradeId, 'edit']"
-                class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.08]">
+                class="glass-interactive inline-flex min-w-[120px] items-center justify-center rounded-2xl px-4 py-2.5 text-sm font-semibold text-slate-100">
                 {{ i18n.t('common.actions.edit') }}
               </a>
               <button
                 type="button"
-                class="inline-flex items-center justify-center rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2.5 text-sm font-semibold text-rose-200 transition hover:bg-rose-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+                class="glass-interactive inline-flex min-w-[120px] items-center justify-center rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2.5 text-sm font-semibold text-rose-200 transition disabled:cursor-not-allowed disabled:opacity-50"
                 [disabled]="deletingTradeId() === trade.tradeId"
                 (click)="deleteTrade(trade)">
                 {{ deletingTradeId() === trade.tradeId ? i18n.t('trade.list.deleteSubmitting') : i18n.t('common.actions.delete') }}
@@ -111,38 +186,38 @@
             </div>
           </div>
 
-          <div class="mt-5 grid gap-4 md:grid-cols-3">
-            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.riskLevels') }}</p>
+          <div class="mt-4 grid gap-3 md:grid-cols-3">
+            <div class="rounded-[20px] bg-white/[0.03] p-4">
+              <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.riskLevels') }}</p>
               <p class="mt-2 text-sm text-slate-300">SL {{ formatNumber(trade.stopLoss) }}</p>
               <p class="mt-1 text-sm text-slate-300">TP {{ formatNumber(trade.takeProfit) }}</p>
             </div>
 
-            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.exit') }}</p>
+            <div class="rounded-[20px] bg-white/[0.03] p-4">
+              <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.exit') }}</p>
               <p class="mt-2 text-sm text-slate-300">
                 {{ trade.exitPrice ? formatNumber(trade.exitPrice) : i18n.t('trade.list.fields.stillOpen') }}
               </p>
             </div>
 
-            <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.lastUpdated') }}</p>
+            <div class="rounded-[20px] bg-white/[0.03] p-4">
+              <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.lastUpdated') }}</p>
               <p class="mt-2 text-sm text-slate-300">{{ trade.updatedAt | date: 'medium' }}</p>
             </div>
           </div>
 
           @if (trade.thesis || trade.note) {
-            <div class="mt-4 grid gap-4 md:grid-cols-2">
+            <div class="mt-4 grid gap-3 md:grid-cols-2">
               @if (trade.thesis) {
-                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                  <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.thesis') }}</p>
+                <div class="rounded-[20px] bg-white/[0.03] p-4">
+                  <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.thesis') }}</p>
                   <p class="mt-2 text-sm leading-6 text-slate-300">{{ trade.thesis }}</p>
                 </div>
               }
 
               @if (trade.note) {
-                <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                  <p class="text-xs uppercase tracking-[0.2em] text-slate-500">{{ i18n.t('trade.list.fields.note') }}</p>
+                <div class="rounded-[20px] bg-white/[0.03] p-4">
+                  <p class="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-300/80">{{ i18n.t('trade.list.fields.note') }}</p>
                   <p class="mt-2 text-sm leading-6 text-slate-300">{{ trade.note }}</p>
                 </div>
               }
@@ -151,30 +226,32 @@
         </article>
       }
 
-      <div class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl md:flex-row md:items-center md:justify-between">
-        <p class="text-sm text-slate-400">
-          Page
-          <span class="font-semibold text-white">{{ currentPage() }}</span>
-          /
-          <span class="font-semibold text-white">{{ totalPages() }}</span>
-        </p>
+      <div class="glass-panel-soft animate-stagger-3 rounded-[24px] p-4 sm:rounded-[28px] sm:p-5">
+        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <p class="text-sm text-slate-400">
+            Page
+            <span class="font-semibold text-white">{{ currentPage() }}</span>
+            /
+            <span class="font-semibold text-white">{{ totalPages() }}</span>
+          </p>
 
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
-            [disabled]="currentPage() === 1"
-            (click)="goToPreviousPage()">
-            Previous
-          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              class="glass-interactive inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium text-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+              [disabled]="currentPage() === 1"
+              (click)="goToPreviousPage()">
+              Previous
+            </button>
 
-          <button
-            type="button"
-            class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-50"
-            [disabled]="currentPage() === totalPages()"
-            (click)="goToNextPage()">
-            Next
-          </button>
+            <button
+              type="button"
+              class="glass-interactive inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium text-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+              [disabled]="currentPage() === totalPages()"
+              (click)="goToNextPage()">
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>

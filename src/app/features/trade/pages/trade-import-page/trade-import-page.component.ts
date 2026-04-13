@@ -48,6 +48,7 @@ export class TradeImportPageComponent {
 
   protected readonly paginatedTrades = computed(() => {
     const preview = this.previewResponse();
+    console.log('Computing paginated trades, preview:', preview?.trades[0]);
     if (!preview) {
       return [];
     }

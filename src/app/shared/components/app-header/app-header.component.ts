@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal,Input, Output, EventEmitter } from '@angular/core';
+import { Component, DestroyRef, inject, signal, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -14,14 +14,11 @@ import { AuthService } from '../../../features/auth/data-access/auth.service';
   templateUrl: './app-header.component.html'
 })
 export class AppHeaderComponent {
-
   @Input() mobileSidebarOpen = false;
   @Input() desktopSidebarCollapsed = false;
 
   @Output() menuClick = new EventEmitter<void>();
-  @Output() desktopToggleClick = new EventEmitter<void>();
 
-  
   protected readonly authService = inject(AuthService);
   protected readonly i18n = inject(I18nService);
   protected readonly themeService = inject(ThemeService);

@@ -1,45 +1,41 @@
 <header class="px-3 pt-3 sm:px-4 sm:pt-4">
   <div
-    class="mx-auto flex h-[72px] sm:h-[76px] items-center justify-between rounded-2xl border border-white/10 bg-white/[0.06] px-4 sm:px-6 shadow-[0_10px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl xl:rounded-[28px]"
+    class="glass-panel mx-auto flex h-[72px] items-center justify-between rounded-2xl px-4 sm:h-[76px] sm:px-6 xl:rounded-[28px]"
   >
     <div class="flex min-w-0 items-center gap-3 sm:gap-4">
       <!-- Mobile menu -->
       <button
         type="button"
-        class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-white/90 transition hover:bg-white/[0.08] xl:hidden"
+        class="glass-interactive flex h-11 w-11 items-center justify-center rounded-2xl text-white/90 xl:hidden"
         (click)="menuClick.emit()"
         aria-label="Open navigation"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-      </button>
-
-      <!-- Desktop collapse -->
-      <button
-        type="button"
-        class="hidden xl:flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-white/90 transition hover:bg-white/[0.08]"
-        (click)="desktopToggleClick.emit()"
-        aria-label="Toggle sidebar"
-      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 transition-transform duration-300"
-          [class.rotate-180]="desktopSidebarCollapsed"
+          class="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.8"
+            d="M4 7h16M4 12h16M4 17h16"
+          />
         </svg>
       </button>
 
-      <div class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-gradient-to-br from-blue-500/80 to-cyan-400/70 text-sm font-bold text-white shadow-[0_8px_30px_rgba(59,130,246,0.35)]">
+      <div
+        class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-gradient-to-br from-blue-500/80 to-cyan-400/70 text-sm font-bold text-white shadow-[0_8px_30px_rgba(59,130,246,0.35)]"
+      >
         TJ
       </div>
 
       <div class="min-w-0">
-        <p class="truncate text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] sm:tracking-[0.32em] text-blue-300/90">
+        <p
+          class="truncate text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] sm:tracking-[0.32em] text-blue-300/90"
+        >
           {{ i18n.t('common.appName') }}
         </p>
         <h1 class="truncate text-base sm:text-lg font-semibold text-white/95">
@@ -49,12 +45,14 @@
     </div>
 
     <div class="flex items-center gap-2 sm:gap-3">
-      <div class="hidden rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 backdrop-blur xl:block">
+      <div class="glass-chip hidden rounded-2xl px-3 py-2 xl:block">
         <app-language-switcher />
       </div>
 
-      <div class="hidden items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] px-3 py-2 backdrop-blur lg:flex">
-        <div class="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/90 text-sm font-semibold text-slate-950">
+      <div class="glass-chip hidden items-center gap-3 rounded-2xl px-3 py-2 lg:flex">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/[0.88] text-sm font-semibold text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
+        >
           {{ authService.currentUserInitial() }}
         </div>
 
@@ -84,7 +82,9 @@
   </div>
 
   @if (submitError()) {
-    <div class="mx-auto mt-3 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur">
+    <div
+      class="mx-auto mt-3 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur"
+    >
       {{ submitError() }}
     </div>
   }
