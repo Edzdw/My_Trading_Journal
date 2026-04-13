@@ -25,7 +25,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       authService.handleUnauthorized(); // ✅ đúng
 
       if (!router.url.startsWith('/login')) {
-        void router.navigate(['/login']);
+        void router.navigate(['/login']),
+        {
+          queryParams: { reason: 'session-expired' }
+        };
       }
     }
 

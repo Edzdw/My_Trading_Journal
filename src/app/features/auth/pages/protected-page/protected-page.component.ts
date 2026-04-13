@@ -9,12 +9,13 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs';
 
 import { AuthService } from '../../data-access/auth.service';
 import { AppHeaderComponent } from '../../../../shared/components/app-header/app-header.component';
 import { AppSidebarComponent } from '../../../../shared/components/app-sidebar/app-sidebar.component';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-protected-page',
@@ -25,6 +26,8 @@ import { AppSidebarComponent } from '../../../../shared/components/app-sidebar/a
 export class ProtectedPageComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
+   private readonly toastService = inject(ToastService);
+   private readonly route = inject(ActivatedRoute);
   private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
 
@@ -90,9 +93,28 @@ export class ProtectedPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService
-      .loadCurrentUserProfile()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
-  }
+  // load user
+  this.authService
+    .loadCurrentUserProfile()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe();
+
+  // 👇 xử lý toast
+  this.route.queryParamMap
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe((params) => {
+      const toast = params.get('toast');
+
+      if (toast === 'login-success') {
+        this.toastService.show('Đăng nhập thành công', 'success');
+
+        // clear query param để tránh reload lại bị spam toast
+        void this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {},
+          replaceUrl: true
+        });
+      }
+    });
+}
 }
