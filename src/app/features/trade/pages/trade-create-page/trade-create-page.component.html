@@ -1,130 +1,175 @@
-    <section class="space-y-6">
-      <div class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white/70 p-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-700">{{ i18n.t('trade.nav.trades') }}</p>
-          <h2 class="mt-2 text-3xl font-semibold text-slate-950">{{ i18n.t('trade.create.title') }}</h2>
-          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            {{ i18n.t('trade.create.description') }}
-          </p>
-        </div>
+<section class="min-w-0 space-y-4 sm:space-y-6">
+  <div class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/[0.05] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:rounded-[28px] sm:p-6 lg:flex-row lg:items-end lg:justify-between">
+    <div class="min-w-0">
+      <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300 sm:text-sm sm:tracking-[0.3em]">
+        {{ i18n.t('trade.nav.trades') }}
+      </p>
 
-        <a
-          routerLink="/app/trades"
-          class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-          {{ i18n.t('common.actions.backToTrades') }}
-        </a>
-      </div>
+      <h2 class="mt-2 text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-4xl">
+        {{ i18n.t('trade.create.title') }}
+      </h2>
 
-      @if (errorMessage()) {
-        <div class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {{ errorMessage() }}
-        </div>
-      }
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+        {{ i18n.t('trade.create.description') }}
+      </p>
+    </div>
 
-      <form
-        class="grid gap-6 rounded-3xl border border-slate-200 bg-white/70 p-6 lg:grid-cols-2"
-        [formGroup]="tradeForm"
-        (ngSubmit)="onSubmit()">
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.symbol') }}</span>
-          <input
-            type="text"
-            formControlName="symbol"
-            placeholder="BTCUSDT"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
-        </label>
+    <a
+      routerLink="/app/trades/list"
+      class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.08] hover:text-white">
+      {{ i18n.t('common.actions.backToTrades') }}
+    </a>
+  </div>
 
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.marketType') }}</span>
-          <select
-            formControlName="marketType"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-            <option value="CRYPTO">{{ i18n.t('trade.form.marketType.crypto') }}</option>
-            <option value="FOREX">{{ i18n.t('trade.form.marketType.forex') }}</option>
-            <option value="STOCK">{{ i18n.t('trade.form.marketType.stock') }}</option>
-            <option value="FUTURES">{{ i18n.t('trade.form.marketType.futures') }}</option>
-          </select>
-        </label>
+  @if (errorMessage()) {
+    <div class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur">
+      {{ errorMessage() }}
+    </div>
+  }
 
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.side') }}</span>
-          <select
-            formControlName="side"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-            <option value="BUY">{{ i18n.t('trade.form.side.buy') }}</option>
-            <option value="SELL">{{ i18n.t('trade.form.side.sell') }}</option>
-          </select>
-        </label>
+  <form
+    class="grid gap-4 rounded-[24px] border border-white/10 bg-white/[0.05] p-4 shadow-[0_20px_80px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:rounded-[28px] sm:gap-5 sm:p-6 xl:grid-cols-2"
+    [formGroup]="tradeForm"
+    (ngSubmit)="onSubmit()">
 
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.openTime') }}</span>
-          <input
-            type="datetime-local"
-            formControlName="openTime"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
-        </label>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.symbol') }}
+      </span>
+      <input
+        type="text"
+        formControlName="symbol"
+        placeholder="BTCUSDT"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]" />
+    </label>
 
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.entryPrice') }}</span>
-          <input
-            type="text"
-            formControlName="entryPrice"
-            placeholder="65000.00000000"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
-        </label>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.marketType') }}
+      </span>
+      <select
+        formControlName="marketType"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]">
+        <option value="CRYPTO" class="bg-slate-900 text-slate-100">
+          {{ i18n.t('trade.form.marketType.crypto') }}
+        </option>
+        <option value="FOREX" class="bg-slate-900 text-slate-100">
+          {{ i18n.t('trade.form.marketType.forex') }}
+        </option>
+        <option value="STOCK" class="bg-slate-900 text-slate-100">
+          {{ i18n.t('trade.form.marketType.stock') }}
+        </option>
+        <option value="FUTURES" class="bg-slate-900 text-slate-100">
+          {{ i18n.t('trade.form.marketType.futures') }}
+        </option>
+      </select>
+    </label>
 
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.stopLoss') }}</span>
-          <input
-            type="text"
-            formControlName="stopLoss"
-            placeholder="64000.00000000"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
-        </label>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.side') }}
+      </span>
+      <select
+        formControlName="side"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]">
+        <option value="BUY" class="bg-slate-900 text-slate-100">
+          {{ i18n.t('trade.form.side.buy') }}
+        </option>
+        <option value="SELL" class="bg-slate-900 text-slate-100">
+          {{ i18n.t('trade.form.side.sell') }}
+        </option>
+      </select>
+    </label>
 
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.takeProfit') }}</span>
-          <input
-            type="text"
-            formControlName="takeProfit"
-            placeholder="69000.00000000"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
-        </label>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.openTime') }}
+      </span>
+      <input
+        type="datetime-local"
+        formControlName="openTime"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]" />
+    </label>
 
-        <label class="space-y-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.quantity') }}</span>
-          <input
-            type="text"
-            formControlName="quantity"
-            placeholder="0.10000000"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100" />
-        </label>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.entryPrice') }}
+      </span>
+      <input
+        type="text"
+        formControlName="entryPrice"
+        placeholder="65000.00000000"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]" />
+    </label>
 
-        <label class="space-y-2 lg:col-span-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.thesis') }}</span>
-          <textarea
-            rows="4"
-            formControlName="thesis"
-            [placeholder]="i18n.t('trade.form.placeholders.thesis')"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"></textarea>
-        </label>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.stopLoss') }}
+      </span>
+      <input
+        type="text"
+        formControlName="stopLoss"
+        placeholder="64000.00000000"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]" />
+    </label>
 
-        <label class="space-y-2 lg:col-span-2">
-          <span class="text-sm font-medium text-slate-700">{{ i18n.t('trade.form.fields.note') }}</span>
-          <textarea
-            rows="4"
-            formControlName="note"
-            [placeholder]="i18n.t('trade.form.placeholders.note')"
-            class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"></textarea>
-        </label>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.takeProfit') }}
+      </span>
+      <input
+        type="text"
+        formControlName="takeProfit"
+        placeholder="69000.00000000"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]" />
+    </label>
 
-        <div class="flex justify-end lg:col-span-2">
-          <button
-            type="submit"
-            class="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-blue-300"
-            [disabled]="isSubmitting()">
-            {{ isSubmitting() ? i18n.t('trade.create.submitting') : i18n.t('trade.create.submit') }}
-          </button>
-        </div>
-      </form>
-    </section>
+    <label class="space-y-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.quantity') }}
+      </span>
+      <input
+        type="text"
+        formControlName="quantity"
+        placeholder="0.10000000"
+        class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]" />
+    </label>
+
+    <label class="space-y-2 xl:col-span-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.thesis') }}
+      </span>
+      <textarea
+        rows="4"
+        formControlName="thesis"
+        [placeholder]="i18n.t('trade.form.placeholders.thesis')"
+        class="min-h-[120px] w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]"></textarea>
+    </label>
+
+    <label class="space-y-2 xl:col-span-2">
+      <span class="text-sm font-medium text-slate-200">
+        {{ i18n.t('trade.form.fields.note') }}
+      </span>
+      <textarea
+        rows="4"
+        formControlName="note"
+        [placeholder]="i18n.t('trade.form.placeholders.note')"
+        class="min-h-[120px] w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-400 focus:bg-white/[0.07]"></textarea>
+    </label>
+
+    <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end xl:col-span-2">
+      <a
+        routerLink="/app/trades/list"
+        class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/[0.08] hover:text-white">
+        {{ i18n.t('common.actions.backToTrades') }}
+      </a>
+
+      <button
+        type="submit"
+        class="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(56,189,248,0.25)] transition hover:scale-[1.01] hover:from-blue-400 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="isSubmitting()">
+        {{ isSubmitting() ? i18n.t('trade.create.submitting') : i18n.t('trade.create.submit') }}
+      </button>
+    </div>
+  </form>
+</section>

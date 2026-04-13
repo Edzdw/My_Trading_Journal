@@ -1,69 +1,78 @@
-<aside class="hidden w-72 shrink-0 xl:block">
-  <div class="flex h-full flex-col rounded-[28px] border border-white/10 bg-white/[0.06] p-4 shadow-[0_16px_50px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
-    <div class="mb-6 rounded-[24px] border border-white/10 bg-white/[0.05] p-4">
-      <p class="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
-        Navigation
-      </p>
-      <h2 class="mt-2 text-xl font-semibold text-white/95">
-        Workspace Menu
-      </h2>
-      <p class="mt-2 text-sm leading-6 text-slate-400">
-        Organize your trading actions in one focused space.
-      </p>
-    </div>
-
-    <nav class="space-y-4">
-      <div class="rounded-[24px] border border-white/10 bg-white/[0.04] p-3">
-        <button
-          type="button"
-          class="flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-semibold text-white/95 transition hover:bg-white/[0.06]"
-          (click)="toggleTradeMenu()">
-          <span>Trade</span>
-          <span class="text-slate-400">{{ tradeMenuOpen() ? '−' : '+' }}</span>
-        </button>
-
-        @if (tradeMenuOpen()) {
-          <div class="mt-3 space-y-2 px-2 pb-2">
-            <a
-              routerLink="/app/trades"
-              routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
-              [routerLinkActiveOptions]="{ exact: true }"
-              class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:bg-white/[0.06] hover:text-white">
-              Overview
-            </a>
-
-            <a
-              routerLink="/app/trades/list"
-              routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
-              class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:bg-white/[0.06] hover:text-white">
-              Trade List
-            </a>
-
-            <a
-              routerLink="/app/trades/new"
-              routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
-              class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:bg-white/[0.06] hover:text-white">
-              New Trade
-            </a>
-
-            <a
-              routerLink="/app/trades/import"
-              routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
-              class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition hover:border-white/10 hover:bg-white/[0.06] hover:text-white">
-              Import Trade
-            </a>
+<div
+  class="flex h-full flex-col rounded-[28px] border border-white/10 bg-white/[0.06] p-3 sm:p-4 shadow-[0_16px_50px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition-all duration-300 ease-out"
+>
+<div
+    class="mb-6 rounded-[24px] border border-white/10 bg-white/[0.05] p-4 transition-all duration-300"
+    [class.hidden]="collapsed && !mobile"
+  >
+    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+      Trade Journal
+    </p>
+    <p class="mt-2 text-sm leading-6 text-slate-400">
+      A cleaner workspace with subtle glass layers makes the product feel calmer and more premium.
+    </p>
+  </div>
+  <nav class="space-y-4">
+    <div class="rounded-[24px] border border-white/10 bg-white/[0.04] p-3">
+      <button
+        type="button"
+        class="flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-semibold text-white/95 transition hover:bg-white/[0.06]"
+        (click)="onTradeRootClick()"
+      >
+        @if (!collapsed || mobile) {
+    
+            <span>Trade</span>
+            <span class="text-slate-400">{{ tradeMenuOpen() ? '−' : '+' }}</span>
+          
+        } @else {
+          <div class="mx-auto text-lg text-white/90">
+            <img width="128" height="128" src="https://img.icons8.com/nolan/64/exchange.png" alt="exchange"/>
           </div>
         }
-      </div>
-    </nav>
+      </button>
 
-    <div class="mt-6 rounded-[24px] border border-white/10 bg-white/[0.05] p-4">
-      <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-        Trade Journal
-      </p>
-      <p class="mt-2 text-sm leading-6 text-slate-400">
-        A cleaner workspace with subtle glass layers makes the product feel calmer and more premium.
-      </p>
+      @if (tradeMenuOpen() && (!collapsed || mobile)) {
+        <div class="mt-3 space-y-2 px-2 pb-2">
+          <a
+            routerLink="/app/trades"
+            routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition duration-300 hover:border-white/10 hover:bg-white/[0.06] hover:text-white"
+            (click)="onNavigate()"
+          >
+            Overview
+          </a>
+
+          <a
+            routerLink="/app/trades/list"
+            routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
+            class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition duration-300 hover:border-white/10 hover:bg-white/[0.06] hover:text-white"
+            (click)="onNavigate()"
+          >
+            Trade List
+          </a>
+
+          <a
+            routerLink="/app/trades/new"
+            routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
+            class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition duration-300 hover:border-white/10 hover:bg-white/[0.06] hover:text-white"
+            (click)="onNavigate()"
+          >
+            New Trade
+          </a>
+
+          <a
+            routerLink="/app/trades/import"
+            routerLinkActive="border-blue-400/20 bg-gradient-to-r from-blue-500/15 to-cyan-400/10 text-white"
+            class="block rounded-2xl border border-transparent px-4 py-3 text-sm text-slate-300 transition duration-300 hover:border-white/10 hover:bg-white/[0.06] hover:text-white"
+            (click)="onNavigate()"
+          >
+            Import Trade
+          </a>
+        </div>
+      }
     </div>
-  </div>
-</aside>
+  </nav>
+
+  
+</div>

@@ -38,6 +38,7 @@ export class AuthService {
     const email = this.currentUserSignal()?.email;
     return email ? email.charAt(0).toUpperCase() : '?';
   });
+  
 
   restoreSession(): void {
     if (!this.isBrowser) {
@@ -63,8 +64,8 @@ export class AuthService {
       map((response) => response.user),
       tap((user) => this.currentUserSignal.set(user)),
       catchError(() => {
-        this.currentUserSignal.set(null);
-        return of(null);
+         this.clearSession();
+         return of(null);
       })
     );
   }
@@ -148,4 +149,8 @@ export class AuthService {
       isAuthenticated: true
     };
   }
+
+  handleUnauthorized(): void {
+  this.clearSession();
+}
 }

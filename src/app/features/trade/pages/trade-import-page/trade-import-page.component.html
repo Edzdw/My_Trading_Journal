@@ -1,328 +1,179 @@
-    <section class="space-y-6">
-      <div class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-        <div class="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-          <div class="max-w-3xl">
-            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-700 dark:text-blue-300">
-              {{ i18n.t('trade.nav.importTrades') }}
-            </p>
-            <h2 class="mt-2 text-3xl font-semibold text-slate-950 dark:text-slate-100">
-              {{ i18n.t('trade.import.title') }}
-            </h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
-              {{ i18n.t('trade.import.description') }}
-            </p>
-            <p class="mt-3 text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-              {{ i18n.t('trade.import.sourceNote') }}
-            </p>
-          </div>
+<section class="min-w-0 space-y-4 sm:space-y-6">
 
-          <div class="flex flex-wrap gap-3">
-            <button
-              type="button"
-              class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-              [disabled]="isPreviewing() || isConfirming()"
-              (click)="fileInput.click()">
-              {{ i18n.t('trade.import.uploadLabel') }}
-            </button>
+  <!-- HEADER -->
+  <div class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/[0.05] p-4 backdrop-blur-xl sm:rounded-[28px] sm:p-6 xl:flex-row xl:items-end xl:justify-between">
 
-            <button
-              type="button"
-              class="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-blue-300 dark:bg-blue-600 dark:hover:bg-blue-500 dark:disabled:bg-slate-700"
-              [disabled]="!selectedFile() || isPreviewing() || isConfirming()"
-              (click)="previewImport()">
-              {{ isPreviewing() ? i18n.t('trade.import.previewing') : i18n.t('trade.import.preview') }}
-            </button>
+    <div class="min-w-0 max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300 sm:text-sm sm:tracking-[0.3em]">
+        {{ i18n.t('trade.nav.importTrades') }}
+      </p>
 
-            <button
-              type="button"
-              class="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400 dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:disabled:bg-slate-700"
-              [disabled]="!canConfirmImport()"
-              (click)="confirmImport()">
-              {{ isConfirming() ? i18n.t('trade.import.confirming') : i18n.t('trade.import.confirm') }}
-            </button>
+      <h2 class="mt-2 text-2xl font-semibold text-white sm:text-3xl lg:text-4xl">
+        {{ i18n.t('trade.import.title') }}
+      </h2>
 
-            <button
-              type="button"
-              class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-              [disabled]="isPreviewing() || isConfirming()"
-              (click)="resetState()">
-              {{ i18n.t('trade.import.reset') }}
-            </button>
-          </div>
-        </div>
+      <p class="mt-2 text-sm leading-6 text-slate-400">
+        {{ i18n.t('trade.import.description') }}
+      </p>
 
-        <input
-          #fileInput
-          type="file"
-          accept=".html,.htm,text/html"
-          class="hidden"
-          (change)="onFileSelected($event)" />
+      <p class="mt-3 text-xs uppercase tracking-[0.2em] text-slate-500">
+        {{ i18n.t('trade.import.sourceNote') }}
+      </p>
+    </div>
 
-        <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50/80 p-6 dark:border-slate-700 dark:bg-slate-900/60">
-          <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ i18n.t('trade.import.uploadLabel') }}</p>
-          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('trade.import.uploadHelp') }}</p>
+    <div class="flex flex-wrap gap-3">
 
-          <div class="mt-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-950/80">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-              {{ i18n.t('trade.import.selectedFile') }}
-            </p>
-            <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">
-              {{ selectedFileName() ?? i18n.t('trade.import.noFileSelected') }}
-            </p>
-          </div>
+      <button
+        type="button"
+        class="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-slate-200 hover:bg-white/[0.08]"
+        (click)="fileInput.click()">
+        {{ i18n.t('trade.import.uploadLabel') }}
+      </button>
 
-          @if (!selectedFile() && !previewResponse()) {
-            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('trade.import.previewRequired') }}</p>
-          }
-        </div>
+      <button
+        type="button"
+        class="rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white"
+        [disabled]="!selectedFile()"
+        (click)="previewImport()">
+        {{ i18n.t('trade.import.preview') }}
+      </button>
+
+      <button
+        type="button"
+        class="rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white"
+        [disabled]="!canConfirmImport()"
+        (click)="confirmImport()">
+        {{ i18n.t('trade.import.confirm') }}
+      </button>
+
+      <button
+        type="button"
+        class="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-slate-200 hover:bg-white/[0.08]"
+        (click)="resetState()">
+        {{ i18n.t('trade.import.reset') }}
+      </button>
+
+    </div>
+  </div>
+
+  <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" />
+
+  <!-- UPLOAD BOX -->
+  <div class="rounded-[24px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl">
+
+    <p class="text-sm font-semibold text-white">
+      {{ i18n.t('trade.import.uploadLabel') }}
+    </p>
+
+    <p class="mt-1 text-sm text-slate-400">
+      {{ i18n.t('trade.import.uploadHelp') }}
+    </p>
+
+    <div class="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+      <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
+        {{ i18n.t('trade.import.selectedFile') }}
+      </p>
+
+      <p class="mt-2 text-sm text-white">
+        {{ selectedFileName() ?? i18n.t('trade.import.noFileSelected') }}
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ERROR -->
+  @if (errorMessage()) {
+    <div class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-red-200">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- PREVIEW -->
+  @if (previewResponse(); as preview) {
+
+    <!-- SUMMARY -->
+    <div class="grid gap-4 xl:grid-cols-3">
+
+      <article class="rounded-[24px] border border-white/10 bg-white/[0.05] p-5">
+        <p class="text-xs text-slate-400">Total Rows</p>
+        <p class="mt-2 text-2xl text-white">{{ preview.summary.totalRows }}</p>
+      </article>
+
+      <article class="rounded-[24px] border border-blue-400/20 bg-blue-500/10 p-5">
+        <p class="text-xs text-blue-200">Parsed</p>
+        <p class="mt-2 text-2xl text-blue-100">{{ preview.summary.parsedRows }}</p>
+      </article>
+
+      <article class="rounded-[24px] border border-amber-400/20 bg-amber-500/10 p-5">
+        <p class="text-xs text-amber-200">Skipped</p>
+        <p class="mt-2 text-2xl text-amber-100">{{ preview.summary.skippedRows }}</p>
+      </article>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="rounded-[24px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl">
+
+      <h3 class="text-lg font-semibold text-white">
+        {{ i18n.t('trade.import.previewTable.title') }}
+      </h3>
+
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-sm">
+
+          <thead>
+            <tr class="text-left text-xs uppercase text-slate-400">
+              @for (column of previewColumns; track column.key) {
+                <th class="px-4 py-3">
+                  {{ i18n.t(column.labelKey) }}
+                </th>
+              }
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (trade of paginatedTrades(); track trade.externalPositionId) {
+              <tr class="border-t border-white/10">
+
+                <td class="px-4 py-3 text-white">
+                  {{ trade.externalPositionId }}
+                </td>
+
+                <td class="px-4 py-3 text-slate-300">
+                  {{ trade.symbol }}
+                </td>
+
+                <td class="px-4 py-3">
+                  <span
+                    class="rounded-full px-3 py-1 text-xs"
+                    [ngClass]="trade.side === 'BUY'
+                      ? 'bg-emerald-500/15 text-emerald-200'
+                      : 'bg-rose-500/15 text-rose-200'">
+                    {{ trade.side }}
+                  </span>
+                </td>
+
+                <td class="px-4 py-3 text-slate-300">
+                  {{ formatNumber(trade.quantity) }}
+                </td>
+
+                <td class="px-4 py-3 text-slate-300">
+                  {{ formatNumber(trade.entryPrice) }}
+                </td>
+
+                <td class="px-4 py-3 text-slate-300">
+                  {{ formatNumber(trade.profit) }}
+                </td>
+
+              </tr>
+            }
+          </tbody>
+
+        </table>
       </div>
 
-      @if (errorMessage()) {
-        <div class="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-950/40 dark:text-red-200">
-          {{ errorMessage() }}
-        </div>
-      }
+    </div>
 
-      @if (successMessage()) {
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/40 dark:text-emerald-200">
-          {{ successMessage() }}
-        </div>
-      }
+  }
 
-      @if (previewResponse(); as preview) {
-        <div class="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-            <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('trade.import.metadata.title') }}</h3>
-            <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.originalFilename') }}</p>
-                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.originalFilename }}</p>
-              </article>
-              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.accountNo') }}</p>
-                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.accountNo ?? i18n.t('common.states.notAvailable') }}</p>
-              </article>
-              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.accountName') }}</p>
-                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.accountName ?? i18n.t('common.states.notAvailable') }}</p>
-              </article>
-              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.brokerName') }}</p>
-                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.brokerName ?? i18n.t('common.states.notAvailable') }}</p>
-              </article>
-              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.brokerServer') }}</p>
-                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ preview.summary.brokerServer ?? i18n.t('common.states.notAvailable') }}</p>
-              </article>
-              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.reportDate') }}</p>
-                <p class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">{{ formatDateValue(preview.summary.reportDate) }}</p>
-              </article>
-            </div>
-          </section>
-
-          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-            <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('trade.import.confirmSummary.title') }}</h3>
-            <div class="mt-5 grid gap-4 sm:grid-cols-3">
-              <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/80">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">{{ i18n.t('trade.import.metadata.totalRows') }}</p>
-                <p class="mt-2 text-2xl font-semibold text-slate-950 dark:text-slate-100">{{ preview.summary.totalRows }}</p>
-              </article>
-              <article class="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-950/30">
-                <p class="text-xs uppercase tracking-[0.2em] text-blue-700 dark:text-blue-200">{{ i18n.t('trade.import.metadata.parsedRows') }}</p>
-                <p class="mt-2 text-2xl font-semibold text-blue-900 dark:text-blue-100">{{ preview.summary.parsedRows }}</p>
-              </article>
-              <article class="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/30 dark:bg-amber-950/30">
-                <p class="text-xs uppercase tracking-[0.2em] text-amber-700 dark:text-amber-200">{{ i18n.t('trade.import.metadata.skippedRows') }}</p>
-                <p class="mt-2 text-2xl font-semibold text-amber-900 dark:text-amber-100">{{ preview.summary.skippedRows }}</p>
-              </article>
-            </div>
-          </section>
-        </div>
-
-        <div class="grid gap-6 xl:grid-cols-2">
-          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-            <h3 class="text-lg font-semibold text-amber-900 dark:text-amber-100">{{ i18n.t('trade.import.warningsTitle') }}</h3>
-            @if (preview.warnings.length > 0) {
-              <ul class="mt-4 space-y-3">
-                @for (warning of preview.warnings; track warning) {
-                  <li class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
-                    {{ warning }}
-                  </li>
-                }
-              </ul>
-            } @else {
-              <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('common.states.notAvailable') }}</p>
-            }
-          </section>
-
-          <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-            <h3 class="text-lg font-semibold text-red-900 dark:text-red-100">{{ i18n.t('trade.import.errorsTitle') }}</h3>
-            @if (preview.errors.length > 0) {
-              <ul class="mt-4 space-y-3">
-                @for (previewError of preview.errors; track previewError) {
-                  <li class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-200">
-                    {{ previewError }}
-                  </li>
-                }
-              </ul>
-            } @else {
-              <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('common.states.notAvailable') }}</p>
-            }
-          </section>
-        </div>
-
-        <section class="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-          <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h3 class="text-xl font-semibold text-slate-950 dark:text-slate-100">{{ i18n.t('trade.import.previewTable.title') }}</h3>
-              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ i18n.t('trade.import.previewTable.description') }}</p>
-            </div>
-
-            @if (preview.trades.length > 0) {
-              <div class="flex flex-wrap items-center gap-3">
-                <label class="text-sm text-slate-500 dark:text-slate-400">
-                  Rows per page
-                </label>
-                <select
-                  class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-                  [value]="pageSize()"
-                  (change)="onPageSizeChange($event)">
-                  <option [value]="10">10</option>
-                  <option [value]="20">20</option>
-                  <option [value]="50">50</option>
-                  <option [value]="100">100</option>
-                </select>
-              </div>
-            }
-          </div>
-
-          @if (preview.trades.length === 0) {
-            <div class="mt-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
-              {{ i18n.t('trade.import.previewTable.empty') }}
-            </div>
-          } @else {
-            <div class="mt-5 overflow-x-auto">
-              <table class="min-w-full border-separate border-spacing-0">
-                <thead>
-                  <tr>
-                    @for (column of previewColumns; track column.key) {
-                      <th class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 first:rounded-tl-2xl last:rounded-tr-2xl dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
-                        {{ i18n.t(column.labelKey) }}
-                      </th>
-                    }
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (trade of paginatedTrades(); track trackTradeRow($index + ((currentPage() - 1) * pageSize()), trade)) {
-                    <tr class="align-top">
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm font-medium text-slate-900 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-100">{{ trade.externalPositionId }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ trade.symbol }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm dark:border-slate-800 dark:bg-slate-950/40">
-                        <span
-                          class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-                          [ngClass]="trade.side === 'BUY' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-200'">
-                          {{ formatSideLabel(trade.side) }}
-                        </span>
-                      </td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.quantity) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.entryPrice) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.stopLoss) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.takeProfit) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatDateValue(trade.openTime) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.exitPrice) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatDateValue(trade.closeTime) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.commission) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.swap) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatNumber(trade.fee) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm font-medium dark:border-slate-800 dark:bg-slate-950/40" [ngClass]="getProfitClass(trade.profit)">
-                        {{ formatNumber(trade.profit) }}
-                      </td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ formatCloseReason(trade.closeReason) }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ trade.externalOrderId ?? i18n.t('common.states.notAvailable') }}</td>
-                      <td class="border-b border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">{{ trade.rawComment ?? i18n.t('common.states.notAvailable') }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-
-            <div class="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 md:flex-row md:items-center md:justify-between dark:border-slate-800">
-              <p class="text-sm text-slate-500 dark:text-slate-400">
-                Showing
-                <span class="font-semibold text-slate-900 dark:text-slate-100">
-                  {{ startRow() }}
-                </span>
-                -
-                <span class="font-semibold text-slate-900 dark:text-slate-100">
-                  {{ endRow() }}
-                </span>
-                of
-                <span class="font-semibold text-slate-900 dark:text-slate-100">
-                  {{ totalPreviewTrades() }}
-                </span>
-              </p>
-
-              <div class="flex items-center gap-2">
-                <button
-                  type="button"
-                  class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-                  [disabled]="currentPage() === 1"
-                  (click)="goToPreviousPage()">
-                  Previous
-                </button>
-
-                <span class="px-3 text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Page {{ currentPage() }} / {{ totalPages() }}
-                </span>
-
-                <button
-                  type="button"
-                  class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-                  [disabled]="currentPage() === totalPages()"
-                  (click)="goToNextPage()">
-                  Next
-                </button>
-              </div>
-            </div>
-          }
-        </section>
-      }
-
-      @if (confirmResponse(); as confirmResult) {
-        <section class="rounded-[2rem] border border-emerald-200 bg-emerald-50/90 p-6 shadow-sm dark:border-emerald-500/30 dark:bg-emerald-950/30">
-          <h3 class="text-xl font-semibold text-emerald-900 dark:text-emerald-100">{{ i18n.t('trade.import.confirmSummary.title') }}</h3>
-          <div class="mt-5 grid gap-4 md:grid-cols-4">
-            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
-              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.importBatchId') }}</p>
-              <p class="mt-2 break-all text-sm font-medium text-slate-900 dark:text-slate-100">{{ confirmResult.summary.importBatchId }}</p>
-            </article>
-            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
-              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.totalRows') }}</p>
-              <p class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{{ confirmResult.summary.totalRows }}</p>
-            </article>
-            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
-              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.importedRows') }}</p>
-              <p class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{{ confirmResult.summary.importedRows }}</p>
-            </article>
-            <article class="rounded-2xl border border-emerald-200 bg-white/80 p-4 dark:border-emerald-500/20 dark:bg-slate-950/40">
-              <p class="text-xs uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{{ i18n.t('trade.import.confirmSummary.skippedRows') }}</p>
-              <p class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{{ confirmResult.summary.skippedRows }}</p>
-            </article>
-          </div>
-
-          @if (confirmResult.warnings.length > 0) {
-            <div class="mt-6">
-              <h4 class="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-900 dark:text-emerald-100">{{ i18n.t('trade.import.warningsTitle') }}</h4>
-              <ul class="mt-3 space-y-3">
-                @for (warning of confirmResult.warnings; track warning) {
-                  <li class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
-                    {{ warning }}
-                  </li>
-                }
-              </ul>
-            </div>
-          }
-        </section>
-      }
-    </section>
+</section>
