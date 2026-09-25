@@ -1,9 +1,7 @@
 <app-auth-shell activeView="register">
   <div class="space-y-5 sm:space-y-6">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-blue-300/80">
-        Trade Journal
-      </p>
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-blue-300/80">Trade Journal</p>
 
       <h2 class="mt-2 text-2xl sm:text-3xl font-semibold text-white/95">
         {{ i18n.t('auth.register.title') }}
@@ -15,7 +13,9 @@
     </div>
 
     @if (submitError()) {
-      <div class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+      <div
+        class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+      >
         {{ submitError() }}
       </div>
     }
@@ -32,6 +32,16 @@
           class="glass-input w-full rounded-2xl px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
           placeholder="trader@example.com"
         />
+
+        @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+          <p class="text-xs text-red-300">
+            @if (registerForm.controls.email.hasError('required')) {
+              Email là bắt buộc.
+            } @else if (registerForm.controls.email.hasError('email')) {
+              Email không hợp lệ.
+            }
+          </p>
+        }
       </label>
 
       <label class="block space-y-2">
@@ -45,6 +55,16 @@
           class="glass-input w-full rounded-2xl px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
           [placeholder]="i18n.t('auth.register.passwordPlaceholder')"
         />
+
+        @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+          <p class="text-xs text-red-300">
+            @if (registerForm.controls.password.hasError('required')) {
+              Mật khẩu là bắt buộc.
+            } @else if (registerForm.controls.password.hasError('minlength')) {
+              Mật khẩu phải có ít nhất 8 ký tự.
+            }
+          </p>
+        }
       </label>
 
       <button
@@ -54,7 +74,9 @@
       >
         @if (isSubmitting()) {
           <span class="flex items-center justify-center gap-2">
-            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent"></span>
+            <span
+              class="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent"
+            ></span>
             {{ i18n.t('auth.register.submitting') }}
           </span>
         } @else {
@@ -65,12 +87,9 @@
 
     <div class="glass-panel rounded-2xl p-4 text-sm text-slate-400">
       {{ i18n.t('auth.register.existingAccount') }}
-      <a
-        routerLink="/login"
-        class="ml-1 font-semibold text-blue-300 hover:text-blue-200"
-      >
-        {{ i18n.t('auth.register.signInHere') }}
-      </a>.
+      <a routerLink="/login" class="ml-1 font-semibold text-blue-300 hover:text-blue-200">
+        {{ i18n.t('auth.register.signInHere') }} </a
+      >.
     </div>
   </div>
 </app-auth-shell>

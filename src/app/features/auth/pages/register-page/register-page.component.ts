@@ -28,26 +28,37 @@ export class RegisterPageComponent {
   });
 
   protected onSubmit(): void {
-    if (this.registerForm.invalid) {
-      this.registerForm.markAllAsTouched();
-      return;
-    }
+  console.log('🔥 REGISTER onSubmit fired');
 
-    this.isSubmitting.set(true);
-    this.submitError.set(null);
-
-    this.authService
-      .register(this.registerForm.getRawValue())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.isSubmitting.set(false);
-          void this.router.navigate(['/app']);
-        },
-        error: (error) => {
-          this.isSubmitting.set(false);
-          this.submitError.set(error?.error?.message ?? this.i18n.t('auth.register.fallbackError'));
-        }
-      });
+  if (this.registerForm.invalid) {
+    console.log('❌ FORM INVALID', this.registerForm.getRawValue());
+    this.registerForm.markAllAsTouched();
+    return;
   }
+
+  console.log('✅ FORM VALID', this.registerForm.getRawValue());
+
+  this.isSubmitting.set(true);
+  this.submitError.set(null);
+
+  this.authService
+    .register(this.registerForm.getRawValue())
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (response) => {
+        console.log('✅ REGISTER SUCCESS', response);
+
+        this.isSubmitting.set(false);
+        void this.router.navigate(['/app']);
+      },
+      error: (error) => {
+        console.error('❌ REGISTER ERROR', error);
+
+        this.isSubmitting.set(false);
+        this.submitError.set(
+          error?.error?.message ?? this.i18n.t('auth.register.fallbackError')
+        );
+      }
+    });
+}
 }

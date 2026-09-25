@@ -15,7 +15,6 @@ import {
   imports: [NgClass],
   providers: [DecimalPipe, DatePipe],
   templateUrl: './trade-import-page.component.html'
-
 })
 export class TradeImportPageComponent {
   protected readonly i18n = inject(I18nService);
