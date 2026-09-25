@@ -1,0 +1,73 @@
+<section class="auth-shell">
+  <div class="auth-grid"></div>
+  <div class="auth-scanline"></div>
+
+  <header class="auth-topbar">
+    <a routerLink="/login" class="auth-brand">
+      <span class="auth-brand-mark">TJ</span>
+
+      <span class="auth-brand-copy">
+        <strong>{{ i18n.t('common.appName') }}</strong>
+        <small>TRADING JOURNAL</small>
+      </span>
+    </a>
+
+    <div class="auth-topbar-actions">
+      <span class="system-status">
+        <span class="status-dot"></span>
+        SYSTEM ONLINE
+      </span>
+
+      <app-language-switcher />
+    </div>
+  </header>
+
+  <main class="auth-stage">
+    <div class="auth-terminal">
+
+      <div class="terminal-header">
+        <div>
+          <span class="terminal-label">AUTHENTICATION</span>
+          <span class="terminal-code">SYS://AUTH/01</span>
+        </div>
+
+        <span class="terminal-status">SECURE CONNECTION</span>
+      </div>
+
+      <nav class="auth-tabs">
+        <a
+          routerLink="/login"
+          class="auth-tab"
+          [class.active]="activeView() === 'login'"
+        >
+          <span class="tab-index">01</span>
+          {{ i18n.t('auth.shell.tabs.login') }}
+        </a>
+
+        <a
+          routerLink="/register"
+          class="auth-tab"
+          [class.active]="activeView() === 'register'"
+        >
+          <span class="tab-index">02</span>
+          {{ i18n.t('auth.shell.tabs.register') }}
+        </a>
+      </nav>
+
+      <div
+        class="auth-content"
+        [class.slide-left]="direction() === 'left'"
+        [class.slide-right]="direction() === 'right'"
+      >
+        <ng-content />
+      </div>
+
+      <div class="terminal-footer">
+        <span>TRADE JOURNAL OS</span>
+        <span>AUTH NODE 01</span>
+        <span>ENCRYPTED</span>
+      </div>
+
+    </div>
+  </main>
+</section>

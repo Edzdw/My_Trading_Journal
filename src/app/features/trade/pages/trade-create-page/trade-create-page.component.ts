@@ -10,7 +10,8 @@ import { buildTradeForm } from '../../utils/trade-form.util';
 @Component({
   selector: 'app-trade-create-page',
   imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './trade-create-page.component.html'
+  templateUrl: './trade-create-page.component.html',
+  styleUrl: './trade-create-page.component.css'
 })
 export class TradeCreatePageComponent {
   protected readonly i18n = inject(I18nService);

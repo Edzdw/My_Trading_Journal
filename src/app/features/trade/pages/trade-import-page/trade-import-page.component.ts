@@ -12,9 +12,9 @@ import {
 
 @Component({
   selector: 'app-trade-import-page',
-  imports: [NgClass],
   providers: [DecimalPipe, DatePipe],
-  templateUrl: './trade-import-page.component.html'
+  templateUrl: './trade-import-page.component.html',
+  styleUrl: './trade-import-page.component.css'
 })
 export class TradeImportPageComponent {
   protected readonly i18n = inject(I18nService);
@@ -47,7 +47,6 @@ export class TradeImportPageComponent {
 
   protected readonly paginatedTrades = computed(() => {
     const preview = this.previewResponse();
-    console.log('Computing paginated trades, preview:', preview?.trades[0]);
     if (!preview) {
       return [];
     }

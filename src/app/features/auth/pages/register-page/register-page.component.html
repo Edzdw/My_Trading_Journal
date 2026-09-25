@@ -1,95 +1,116 @@
 <app-auth-shell activeView="register">
-  <div class="space-y-5 sm:space-y-6">
-    <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-blue-300/80">Trade Journal</p>
 
-      <h2 class="mt-2 text-2xl sm:text-3xl font-semibold text-white/95">
+  <div class="register-content">
+
+    <div class="register-heading">
+      <span class="register-eyebrow">
+        AUTH / REGISTER
+      </span>
+
+      <h2>
         {{ i18n.t('auth.register.title') }}
       </h2>
 
-      <p class="mt-2 text-sm text-slate-400">
+      <p>
         {{ i18n.t('auth.register.subtitle') }}
       </p>
     </div>
 
     @if (submitError()) {
-      <div
-        class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"
-      >
-        {{ submitError() }}
+      <div class="register-error">
+        <span class="error-icon">!</span>
+
+        <div>
+          <strong>REGISTRATION FAILED</strong>
+          <span>{{ submitError() }}</span>
+        </div>
       </div>
     }
 
-    <form class="space-y-4 sm:space-y-5" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <label class="block space-y-2">
-        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+    <form
+      class="register-form"
+      [formGroup]="registerForm"
+      (ngSubmit)="onSubmit()"
+    >
+
+      <label class="field">
+        <span class="field-label">
           {{ i18n.t('auth.register.email') }}
         </span>
 
         <input
           type="email"
           formControlName="email"
-          class="glass-input w-full rounded-2xl px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
           placeholder="trader@example.com"
+          autocomplete="email"
         />
 
         @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
-          <p class="text-xs text-red-300">
+          <span class="field-error">
             @if (registerForm.controls.email.hasError('required')) {
               Email là bắt buộc.
             } @else if (registerForm.controls.email.hasError('email')) {
               Email không hợp lệ.
             }
-          </p>
+          </span>
         }
       </label>
 
-      <label class="block space-y-2">
-        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+      <label class="field">
+        <span class="field-label">
           {{ i18n.t('auth.register.password') }}
         </span>
 
         <input
           type="password"
           formControlName="password"
-          class="glass-input w-full rounded-2xl px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
           [placeholder]="i18n.t('auth.register.passwordPlaceholder')"
+          autocomplete="new-password"
         />
 
         @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
-          <p class="text-xs text-red-300">
+          <span class="field-error">
             @if (registerForm.controls.password.hasError('required')) {
               Mật khẩu là bắt buộc.
             } @else if (registerForm.controls.password.hasError('minlength')) {
               Mật khẩu phải có ít nhất 8 ký tự.
             }
-          </p>
+          </span>
         }
       </label>
 
       <button
         type="submit"
-        class="glass-button w-full rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.02] hover:from-blue-400 hover:to-cyan-300 active:scale-[0.98] disabled:opacity-60"
+        class="auth-submit"
         [disabled]="isSubmitting()"
       >
         @if (isSubmitting()) {
-          <span class="flex items-center justify-center gap-2">
-            <span
-              class="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent"
-            ></span>
+          <span class="submit-loading">
+            <span class="loading-dot"></span>
             {{ i18n.t('auth.register.submitting') }}
           </span>
         } @else {
-          {{ i18n.t('auth.register.submit') }}
+          <span>
+            {{ i18n.t('auth.register.submit') }}
+          </span>
+
+          <span class="submit-arrow">→</span>
         }
       </button>
+
     </form>
 
-    <div class="glass-panel rounded-2xl p-4 text-sm text-slate-400">
-      {{ i18n.t('auth.register.existingAccount') }}
-      <a routerLink="/login" class="ml-1 font-semibold text-blue-300 hover:text-blue-200">
-        {{ i18n.t('auth.register.signInHere') }} </a
-      >.
+    <div class="register-login">
+      <span>
+        {{ i18n.t('auth.register.existingAccount') }}
+      </span>
+
+      <a routerLink="/login">
+        {{ i18n.t('auth.register.signInHere') }}
+        <span>→</span>
+      </a>
     </div>
+
   </div>
+
 </app-auth-shell>

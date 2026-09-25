@@ -1,85 +1,110 @@
 <app-auth-shell activeView="login">
-  <div class="space-y-5 sm:space-y-6">
-    <div>
-      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-blue-300/80">
-        Trade Journal
-      </p>
 
-      <h2 class="mt-2 text-2xl sm:text-3xl font-semibold text-white/95">
+  <div class="login-content">
+
+    <div class="login-heading">
+      <span class="login-eyebrow">
+        AUTH / LOGIN
+      </span>
+
+      <h2>
         {{ i18n.t('auth.login.title') }}
       </h2>
 
-      <p class="mt-2 text-sm text-slate-400">
+      <p>
         {{ i18n.t('auth.login.subtitle') }}
       </p>
     </div>
 
     @if (submitError()) {
-      <div class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-        {{ submitError() }}
+      <div class="login-error">
+        <span class="error-icon">!</span>
+
+        <div>
+          <strong>ACCESS DENIED</strong>
+          <span>{{ submitError() }}</span>
+        </div>
       </div>
     }
 
-    <form class="space-y-4 sm:space-y-5" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <label class="block space-y-2">
-        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+    <form
+      class="login-form"
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+    >
+
+      <label class="field">
+        <span class="field-label">
           {{ i18n.t('auth.login.email') }}
         </span>
 
         <input
           type="email"
           formControlName="email"
-          class="glass-input w-full rounded-2xl px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
           placeholder="trader@example.com"
+          autocomplete="email"
         />
       </label>
 
-      <label class="block space-y-2">
-        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+      <label class="field">
+        <span class="field-label">
           {{ i18n.t('auth.login.password') }}
         </span>
 
         <input
           type="password"
           formControlName="password"
-          class="glass-input w-full rounded-2xl px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
           [placeholder]="i18n.t('auth.login.passwordPlaceholder')"
+          autocomplete="current-password"
         />
       </label>
 
       <button
         type="submit"
-        class="glass-button w-full rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.02] hover:from-blue-400 hover:to-cyan-300 active:scale-[0.98] disabled:opacity-60"
+        class="auth-submit"
         [disabled]="isSubmitting()"
       >
         @if (isSubmitting()) {
-          <span class="flex items-center justify-center gap-2">
-            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent"></span>
-            {{ i18n.t('auth.login.submitting') }}
+          <span class="submit-loading">
+            <span class="loading-dot"></span>
+            AUTHENTICATING...
           </span>
         } @else {
-          {{ i18n.t('auth.login.submit') }}
+          <span>{{ i18n.t('auth.login.submit') }}</span>
+          <span class="submit-arrow">→</span>
         }
       </button>
+
     </form>
 
-    <div class="glass-panel rounded-2xl p-4 text-sm text-slate-400">
-      {{ i18n.t('auth.login.noAccount') }}
-      <a routerLink="/register" class="ml-1 font-semibold text-blue-300 hover:text-blue-200">
+    <div class="login-register">
+      <span>
+        {{ i18n.t('auth.login.noAccount') }}
+      </span>
+
+      <a routerLink="/register">
         {{ i18n.t('auth.login.createOne') }}
-      </a>.
+        <span>→</span>
+      </a>
     </div>
 
     @if (authService.isAuthenticated()) {
-      <div class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm text-emerald-200">
-        {{ i18n.t('auth.login.existingSession') }}
-        <button type="button" class="ml-1 font-semibold underline" (click)="goToApp()">
+      <div class="existing-session">
+        <div>
+          <span class="session-dot"></span>
+          SESSION ACTIVE
+        </div>
+
+        <button
+          type="button"
+          (click)="goToApp()"
+        >
           {{ i18n.t('common.actions.openProtectedPage') }}
+          →
         </button>
       </div>
     }
+
   </div>
+
 </app-auth-shell>
-
-
-

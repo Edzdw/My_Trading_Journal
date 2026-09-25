@@ -10,7 +10,8 @@ import { AuthService } from '../../data-access/auth.service';
 @Component({
   selector: 'app-register-page',
   imports: [ReactiveFormsModule, RouterLink, AuthShellComponent],
-  templateUrl: './register-page.component.html'
+  templateUrl: './register-page.component.html',
+  styleUrl: './register-page.component.css'
 })
 export class RegisterPageComponent {
   protected readonly i18n = inject(I18nService);

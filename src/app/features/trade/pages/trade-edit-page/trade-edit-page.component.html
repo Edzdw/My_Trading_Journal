@@ -1,191 +1,365 @@
-<section class="min-w-0 space-y-5 sm:space-y-6">
+<section class="edit-page">
 
   <!-- HERO -->
-  <div class="glass-panel rounded-[24px] p-4 sm:rounded-[28px] sm:p-5 lg:p-6">
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-
-      <div class="min-w-0">
-        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300 sm:text-sm sm:tracking-[0.3em]">
-          {{ i18n.t('trade.nav.trades') }}
-        </p>
-
-        <h2 class="mt-2 text-2xl font-semibold text-white sm:text-3xl lg:text-4xl">
-          {{ i18n.t('trade.edit.title') }}
-        </h2>
-
-        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-300/85">
-          {{ i18n.t('trade.edit.description') }}
-        </p>
+  <div class="edit-hero">
+    <div class="edit-hero__main">
+      <div class="section-kicker">
+        {{ i18n.t('trade.nav.trades') }}
       </div>
 
-      <div class="flex flex-wrap items-center gap-3">
-        <div class="glass-chip px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
-          Editing Trade
-        </div>
+      <h2 class="edit-hero__title">
+        {{ i18n.t('trade.edit.title') }}
+      </h2>
 
-        <a
-          routerLink="/app/trades/list"
-          class="glass-interactive px-4 py-3 text-sm font-semibold text-slate-100 rounded-2xl">
-          {{ i18n.t('common.actions.backToTrades') }}
-        </a>
+      <p class="edit-hero__description">
+        {{ i18n.t('trade.edit.description') }}
+      </p>
+    </div>
+
+    <div class="edit-hero__actions">
+      <div class="hud-chip hud-chip--blue">
+        <span class="hud-chip__dot"></span>
+        EDITING TRADE
       </div>
+
+      <a
+        routerLink="/app/trades/list"
+        class="hud-button hud-button--ghost"
+      >
+        {{ i18n.t('common.actions.backToTrades') }}
+      </a>
     </div>
   </div>
 
+  <!-- ERROR -->
   @if (errorMessage()) {
-    <div class="glass-panel-soft border border-red-400/20 px-4 py-3 text-sm text-red-200 rounded-2xl">
-      {{ errorMessage() }}
+    <div class="status-banner status-banner--error">
+      <span class="status-banner__icon">!</span>
+
+      <div>
+        <strong>Something went wrong</strong>
+        <p>{{ errorMessage() }}</p>
+      </div>
     </div>
   }
 
+  <!-- LOADING -->
   @if (isLoading()) {
-    <div class="glass-panel-soft rounded-[24px] p-6 text-slate-300">
-      {{ i18n.t('trade.edit.loading') }}
+
+    <div class="loading-panel">
+      <div class="loading-icon">↻</div>
+
+      <div>
+        <strong>{{ i18n.t('trade.edit.loading') }}</strong>
+        <p>Loading trade data...</p>
+      </div>
     </div>
+
   } @else {
 
-    <form class="space-y-6" [formGroup]="tradeForm" (ngSubmit)="onSubmit()">
+    <form
+      class="edit-form"
+      [formGroup]="tradeForm"
+      (ngSubmit)="onSubmit()"
+    >
 
-      <!-- IDENTITY BLOCK -->
-      <div class="glass-panel-soft rounded-[24px] p-5">
-        <p class="text-[11px] uppercase tracking-[0.22em] text-blue-300/90">
-          Trade Identity
-        </p>
+      <!-- IDENTITY -->
+      <section class="form-section form-section--blue">
 
-        <div class="mt-4 grid gap-4 md:grid-cols-2">
+        <div class="form-section__header">
+          <div class="step-badge step-badge--blue">
+            01
+          </div>
 
-          <label class="space-y-2">
-            <span class="text-sm font-medium text-slate-100">
+          <div>
+            <p class="section-kicker section-kicker--blue">
+              TRADE IDENTITY
+            </p>
+
+            <h3 class="form-section__title">
+              What are we editing?
+            </h3>
+          </div>
+        </div>
+
+        <div class="field-grid field-grid--2">
+
+          <label class="field">
+            <span class="field__label">
               {{ i18n.t('trade.form.fields.symbol') }}
             </span>
+
+            <span class="field__hint">
+              Market symbol
+            </span>
+
             <input
               type="text"
               formControlName="symbol"
-              class="glass-input w-full px-4 py-3 rounded-2xl text-slate-100"
+              class="hud-input"
             />
           </label>
 
-          <label class="space-y-2">
-            <span class="text-sm font-medium text-slate-100">
+          <label class="field">
+            <span class="field__label">
               {{ i18n.t('trade.form.fields.marketType') }}
             </span>
+
+            <span class="field__hint">
+              Asset class
+            </span>
+
             <select
               formControlName="marketType"
-              class="glass-input w-full px-4 py-3 rounded-2xl text-slate-100">
-              <option class = "text-black" value="CRYPTO">Crypto</option>
-              <option class = "text-black" value="FOREX">Forex</option>
-              <option class = "text-black" value="STOCK">Stock</option>
-              <option class = "text-black" value="FUTURES">Futures</option>
+              class="hud-input"
+            >
+              <option value="CRYPTO">Crypto</option>
+              <option value="FOREX">Forex</option>
+              <option value="STOCK">Stock</option>
+              <option value="FUTURES">Futures</option>
             </select>
           </label>
 
         </div>
-      </div>
+
+      </section>
 
       <!-- EXECUTION -->
-      <div class="glass-panel rounded-[24px] p-5">
-        <p class="text-[11px] uppercase tracking-[0.22em] text-emerald-300/90">
-          Execution
-        </p>
+      <section class="form-section form-section--green">
 
-        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="form-section__header">
+          <div class="step-badge step-badge--green">
+            02
+          </div>
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Side</span>
-            <select formControlName="side" class="glass-input w-full px-4 py-3 rounded-2xl">
+          <div>
+            <p class="section-kicker section-kicker--green">
+              EXECUTION
+            </p>
+
+            <h3 class="form-section__title">
+              Trade setup
+            </h3>
+          </div>
+        </div>
+
+        <div class="field-grid field-grid--4">
+
+          <label class="field">
+            <span class="field__label">Side</span>
+
+            <span class="field__hint">
+              Direction
+            </span>
+
+            <select
+              formControlName="side"
+              class="hud-input"
+            >
               <option value="BUY">BUY</option>
               <option value="SELL">SELL</option>
             </select>
           </label>
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Open Time</span>
-            <input type="datetime-local" formControlName="openTime"
-              class="glass-input w-full px-4 py-3 rounded-2xl" />
+          <label class="field">
+            <span class="field__label">Open Time</span>
+
+            <span class="field__hint">
+              Entry timestamp
+            </span>
+
+            <input
+              type="datetime-local"
+              formControlName="openTime"
+              class="hud-input"
+            />
           </label>
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Entry</span>
-            <input type="text" formControlName="entryPrice"
-              class="glass-input w-full px-4 py-3 rounded-2xl" />
+          <label class="field">
+            <span class="field__label">Entry</span>
+
+            <span class="field__hint">
+              Entry price
+            </span>
+
+            <input
+              type="text"
+              formControlName="entryPrice"
+              class="hud-input"
+            />
           </label>
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Qty</span>
-            <input type="text" formControlName="quantity"
-              class="glass-input w-full px-4 py-3 rounded-2xl" />
+          <label class="field">
+            <span class="field__label">Qty</span>
+
+            <span class="field__hint">
+              Position size
+            </span>
+
+            <input
+              type="text"
+              formControlName="quantity"
+              class="hud-input"
+            />
           </label>
 
         </div>
-      </div>
+
+      </section>
 
       <!-- RISK -->
-      <div class="glass-panel-soft rounded-[24px] p-5">
-        <p class="text-[11px] uppercase tracking-[0.22em] text-amber-300/90">
-          Risk Levels
-        </p>
+      <section class="form-section form-section--yellow">
 
-        <div class="mt-4 grid gap-4 md:grid-cols-2">
+        <div class="form-section__header">
+          <div class="step-badge step-badge--yellow">
+            03
+          </div>
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Stop Loss</span>
-            <input type="text" formControlName="stopLoss"
-              class="glass-input w-full px-4 py-3 rounded-2xl" />
+          <div>
+            <p class="section-kicker section-kicker--yellow">
+              RISK LEVELS
+            </p>
+
+            <h3 class="form-section__title">
+              Protect the position
+            </h3>
+          </div>
+        </div>
+
+        <div class="field-grid field-grid--2">
+
+          <label class="field">
+            <span class="field__label">Stop Loss</span>
+
+            <span class="field__hint">
+              Maximum accepted loss
+            </span>
+
+            <input
+              type="text"
+              formControlName="stopLoss"
+              class="hud-input"
+            />
           </label>
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Take Profit</span>
-            <input type="text" formControlName="takeProfit"
-              class="glass-input w-full px-4 py-3 rounded-2xl" />
+          <label class="field">
+            <span class="field__label">Take Profit</span>
+
+            <span class="field__hint">
+              Target price
+            </span>
+
+            <input
+              type="text"
+              formControlName="takeProfit"
+              class="hud-input"
+            />
           </label>
 
         </div>
-      </div>
 
-      <!-- NOTES -->
-      <div class="glass-panel-soft rounded-[24px] p-5">
-        <p class="text-[11px] uppercase tracking-[0.22em] text-violet-300/90">
-          Journal
-        </p>
+      </section>
 
-        <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <!-- JOURNAL -->
+      <section class="form-section form-section--journal">
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Thesis</span>
-            <textarea rows="4" formControlName="thesis"
-              class="glass-input w-full px-4 py-3 rounded-2xl"></textarea>
+        <div class="form-section__header">
+          <div class="step-badge step-badge--journal">
+            04
+          </div>
+
+          <div>
+            <p class="section-kicker section-kicker--journal">
+              JOURNAL
+            </p>
+
+            <h3 class="form-section__title">
+              Update your thinking
+            </h3>
+          </div>
+        </div>
+
+        <div class="field-grid field-grid--2">
+
+          <label class="field">
+            <span class="field__label">Thesis</span>
+
+            <span class="field__hint">
+              Why did this trade make sense?
+            </span>
+
+            <textarea
+              rows="6"
+              formControlName="thesis"
+              class="hud-input hud-textarea"
+            ></textarea>
           </label>
 
-          <label class="space-y-2">
-            <span class="text-sm text-slate-100">Note</span>
-            <textarea rows="4" formControlName="note"
-              class="glass-input w-full px-4 py-3 rounded-2xl"></textarea>
+          <label class="field">
+            <span class="field__label">Note</span>
+
+            <span class="field__hint">
+              What did you observe?
+            </span>
+
+            <textarea
+              rows="6"
+              formControlName="note"
+              class="hud-input hud-textarea"
+            ></textarea>
           </label>
 
         </div>
-      </div>
+
+      </section>
 
       <!-- ACTION -->
-      <div class="glass-panel-soft rounded-[24px] p-5">
-        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+      <section class="action-panel">
+
+        <div class="action-panel__info">
+          <div class="action-panel__icon">
+            ✓
+          </div>
+
+          <div>
+            <strong>Ready to update?</strong>
+            <p>
+              Review your changes before saving this trade.
+            </p>
+          </div>
+        </div>
+
+        <div class="action-panel__buttons">
 
           <a
             routerLink="/app/trades/list"
-            class="glass-interactive px-5 py-3 rounded-2xl text-sm text-slate-100">
+            class="hud-button hud-button--ghost"
+          >
             {{ i18n.t('common.actions.backToTrades') }}
           </a>
 
           <button
             type="submit"
-            class="glass-button px-5 py-3 rounded-2xl text-sm font-semibold text-white"
-            [disabled]="isSubmitting()">
-            {{ isSubmitting() ? i18n.t('trade.edit.submitting') : i18n.t('trade.edit.submit') }}
+            class="hud-button hud-button--primary"
+            [disabled]="isSubmitting()"
+          >
+            <span>
+              {{ isSubmitting()
+                ? i18n.t('trade.edit.submitting')
+                : i18n.t('trade.edit.submit') }}
+            </span>
+
+            @if (!isSubmitting()) {
+              <span class="button-arrow">→</span>
+            }
           </button>
 
         </div>
-      </div>
+
+      </section>
 
     </form>
 
   }
+
 </section>

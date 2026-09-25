@@ -1,91 +1,97 @@
-<header class="px-3 pt-3 sm:px-4 sm:pt-4">
-  <div
-    class="glass-panel mx-auto flex h-[72px] items-center justify-between rounded-2xl px-4 sm:h-[76px] sm:px-6 xl:rounded-[28px]"
-  >
-    <div class="flex min-w-0 items-center gap-3 sm:gap-4">
-      <!-- Mobile menu -->
+<header class="app-header">
+
+  <div class="app-header-inner">
+
+    <div class="app-header-left">
+
       <button
         type="button"
-        class="glass-interactive flex h-11 w-11 items-center justify-center rounded-2xl text-white/90 xl:hidden"
+        class="header-menu-button"
         (click)="menuClick.emit()"
         aria-label="Open navigation"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.8"
-            d="M4 7h16M4 12h16M4 17h16"
-          />
-        </svg>
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
 
-      <div
-        class="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-gradient-to-br from-blue-500/80 to-cyan-400/70 text-sm font-bold text-white shadow-[0_8px_30px_rgba(59,130,246,0.35)]"
-      >
-        TJ
+
+      <div class="header-brand">
+
+        <div class="header-logo">
+          TJ
+        </div>
+
+        <div class="header-brand-copy">
+          <span class="header-app-name">
+            {{ i18n.t('common.appName') }}
+          </span>
+
+          <h1>
+            Trade Journal
+          </h1>
+        </div>
+
       </div>
 
-      <div class="min-w-0">
-        <p
-          class="truncate text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.28em] sm:tracking-[0.32em] text-blue-300/90"
-        >
-          {{ i18n.t('common.appName') }}
-        </p>
-        <h1 class="truncate text-base sm:text-lg font-semibold text-white/95">
-          Trade Journal Workspace
-        </h1>
-      </div>
     </div>
 
-    <div class="flex items-center gap-2 sm:gap-3">
-      <div class="glass-chip hidden rounded-2xl px-3 py-2 xl:block">
+
+    <div class="app-header-right">
+
+      <div class="header-language">
         <app-language-switcher />
       </div>
 
-      <div class="glass-chip hidden items-center gap-3 rounded-2xl px-3 py-2 lg:flex">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/[0.88] text-sm font-semibold text-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
-        >
+
+      <div class="header-user">
+
+        <div class="header-avatar">
           {{ authService.currentUserInitial() }}
         </div>
 
-        <div class="min-w-0">
-          <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+        <div class="header-user-copy">
+
+          <span>
             {{ i18n.t('auth.protected.signedInAs') }}
-          </p>
-          <p class="truncate text-sm font-medium text-white/95">
-            {{ authService.currentUserEmail() ?? i18n.t('auth.protected.currentUser') }}
-          </p>
+          </span>
+
+          <strong>
+            {{
+              authService.currentUserEmail()
+                ?? i18n.t('auth.protected.currentUser')
+            }}
+          </strong>
+
         </div>
+
       </div>
+
 
       <button
         type="button"
-        class="rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-3 sm:px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(56,189,248,0.25)] transition duration-300 hover:scale-[1.02] hover:from-blue-400 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+        class="header-logout"
         [disabled]="isSubmitting()"
         (click)="logout()"
       >
-        {{
-          isSubmitting()
-            ? i18n.t('auth.protected.logoutSubmitting')
-            : i18n.t('common.actions.logout')
-        }}
+        @if (isSubmitting()) {
+          <span>...</span>
+        } @else {
+          <span>
+            {{ i18n.t('common.actions.logout') }}
+          </span>
+        }
       </button>
+
     </div>
+
   </div>
 
+
   @if (submitError()) {
-    <div
-      class="mx-auto mt-3 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur"
-    >
+    <div class="header-error">
       {{ submitError() }}
     </div>
   }
+
 </header>

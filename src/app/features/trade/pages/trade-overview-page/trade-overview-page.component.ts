@@ -19,7 +19,8 @@ import {
   selector: 'app-trade-overview-page',
   standalone: true,
   imports: [NgClass],
-  templateUrl: './trade-overview-page.component.html'
+  templateUrl: './trade-overview-page.component.html',
+  styleUrl: './trade-overview-page.component.css',
 })
 export class TradeOverviewPageComponent implements OnInit {
   protected readonly i18n = inject(I18nService);

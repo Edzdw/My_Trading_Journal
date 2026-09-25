@@ -1,244 +1,418 @@
-<section class="min-w-0 space-y-4 sm:space-y-6">
+<section class="overview-page">
+
+  <!-- ERROR -->
   @if (errorMessage()) {
-    <div
-      class="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur"
-    >
-      {{ errorMessage() }}
+    <div class="overview-alert overview-alert--error">
+      <span class="overview-alert-icon">!</span>
+
+      <div>
+        <strong>{{ i18n.t('trade.list.loadError') }}</strong>
+        <p>{{ errorMessage() }}</p>
+      </div>
     </div>
   }
 
+  <!-- LOADING -->
   @if (isLoading()) {
-    <div
-      class="rounded-[24px] border border-white/10 bg-white/[0.05] p-5 text-sm text-slate-300 backdrop-blur-xl sm:rounded-[28px] sm:p-8"
-    >
-      {{ i18n.t('trade.list.loading') }}
+    <div class="overview-loading">
+      <div class="loading-star">★</div>
+
+      <div>
+        <strong>Loading trade data...</strong>
+        <span>{{ i18n.t('trade.list.loading') }}</span>
+      </div>
     </div>
   } @else {
-    <div
-      class="glass-panel min-w-0 animate-stagger-1 rounded-[24px] p-4 sm:rounded-[28px] sm:p-5 lg:p-6"
-    >
-      <div class="flex flex-col gap-4 lg:gap-5 xl:flex-row xl:items-end xl:justify-between">
-        <div class="min-w-0">
-          <p
-            class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-300 sm:text-sm sm:tracking-[0.3em]"
-          >
-            {{ i18n.t('trade.dashboard.title') }}
-          </p>
 
-          <h2 class="mt-2 text-2xl font-semibold leading-tight text-white sm:text-3xl lg:text-4xl">
-            {{ i18n.t('trade.dashboard.subtitle') }}
-          </h2>
+    <!-- HEADER -->
+    <section class="overview-header">
 
-          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-            {{ i18n.t('trade.dashboard.description') }}
-          </p>
+      <div class="overview-title">
+
+        <div class="title-kicker">
+          <span class="title-star">★</span>
+          TRADE OVERVIEW
         </div>
 
-        <div class="w-full xl:w-auto xl:min-w-0">
-          <div
-            class="glass-chip flex w-full flex-wrap gap-2 rounded-2xl p-1 text-sm font-medium text-slate-300 sm:rounded-full xl:w-auto xl:flex-nowrap"
-          >
-            @for (range of ranges; track range) {
-              <button
-                type="button"
-                class="min-w-0 flex-1 rounded-xl px-3 py-2 transition sm:rounded-full sm:px-4 xl:flex-none"
-                [ngClass]="
-                  selectedRange() === range
-                    ? 'glass-range-active'
-                    : 'hover:bg-white/[0.08] hover:text-white'
-                "
-                (click)="onRangeChange(range)"
-              >
-                {{ i18n.t('trade.range.' + range) }}
-              </button>
-            }
-          </div>
-        </div>
+        <h1>
+          {{ i18n.t('trade.dashboard.subtitle') }}
+        </h1>
+
+        <p>
+          {{ i18n.t('trade.dashboard.description') }}
+        </p>
+
       </div>
 
-      <div
-        class="animate-stagger-2 mt-5 grid min-w-0 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 2xl:grid-cols-5"
+      <!-- RANGE -->
+      <div class="range-selector">
+
+        <span class="range-label">
+          PERIOD
+        </span>
+
+        <div class="range-buttons">
+          @for (range of ranges; track range) {
+            <button
+              type="button"
+              [class.active]="selectedRange() === range"
+              (click)="onRangeChange(range)"
+            >
+              {{ i18n.t('trade.range.' + range) }}
+            </button>
+          }
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- STAT CARDS -->
+    <section class="stats-grid">
+
+      <!-- TOTAL -->
+      <article class="stat-card stat-card--green">
+
+        <div class="stat-card-top">
+          <span class="stat-icon">★</span>
+
+          <span class="stat-badge">
+            ALL
+          </span>
+        </div>
+
+        <div class="stat-label">
+          {{ i18n.t('trade.dashboard.cards.totalTrades') }}
+        </div>
+
+        <div class="stat-value">
+          {{ analytics().totalTrades }}
+        </div>
+
+        <div class="stat-footer">
+          <span class="status-dot"></span>
+          TOTAL TRADES
+        </div>
+
+      </article>
+
+
+      <!-- OPEN -->
+      <article class="stat-card stat-card--yellow">
+
+        <div class="stat-card-top">
+          <span class="stat-icon">●</span>
+
+          <span class="stat-badge">
+            LIVE
+          </span>
+        </div>
+
+        <div class="stat-label">
+          {{ i18n.t('trade.dashboard.cards.openTrades') }}
+        </div>
+
+        <div class="stat-value">
+          {{ analytics().openTrades }}
+        </div>
+
+        <div class="stat-footer">
+          <span class="status-dot status-dot--yellow"></span>
+          MARKET ACTIVE
+        </div>
+
+      </article>
+
+
+      <!-- CLOSED -->
+      <article class="stat-card stat-card--blue">
+
+        <div class="stat-card-top">
+          <span class="stat-icon">✓</span>
+
+          <span class="stat-badge">
+            DONE
+          </span>
+        </div>
+
+        <div class="stat-label">
+          {{ i18n.t('trade.dashboard.cards.closedTrades') }}
+        </div>
+
+        <div class="stat-value">
+          {{ analytics().closedTrades }}
+        </div>
+
+        <div class="stat-footer">
+          <span class="status-dot status-dot--blue"></span>
+          COMPLETED
+        </div>
+
+      </article>
+
+
+      <!-- MOST TRADED -->
+      <article class="stat-card stat-card--red">
+
+        <div class="stat-card-top">
+          <span class="stat-icon">◆</span>
+
+          <span class="stat-badge">
+            TOP
+          </span>
+        </div>
+
+        <div class="stat-label">
+          {{ i18n.t('trade.dashboard.cards.mostTraded') }}
+        </div>
+
+        <div class="stat-value stat-value--symbol">
+          {{ analytics().mostTradedSymbol }}
+        </div>
+
+        <div class="stat-footer">
+          <span class="status-dot status-dot--red"></span>
+          MAIN SYMBOL
+        </div>
+
+      </article>
+
+
+      <!-- PNL -->
+      <article
+        class="stat-card stat-card--pnl"
+        [class.stat-card--profit]="(analytics().estimatedPnl ?? 0) >= 0"
+        [class.stat-card--loss]="(analytics().estimatedPnl ?? 0) < 0"
       >
-        <article
-          class="glass-panel-soft glass-card min-w-0 rounded-[20px] p-4 sm:rounded-[24px] sm:p-5 hover:shadow-[0_25px_70px_rgba(0,0,0,0.45),0_0_20px_rgba(59,130,246,0.08)]"
-        >
-          <p
-            class="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-xs sm:tracking-[0.2em]"
-          >
-            {{ i18n.t('trade.dashboard.cards.totalTrades') }}
-          </p>
 
-          <p
-            class="mt-3 text-2xl font-semibold text-white sm:text-3xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]"
-          >
-            {{ analytics().totalTrades }}
-          </p>
-        </article>
+        <div class="stat-card-top">
+          <span class="stat-icon">★</span>
 
-        <article
-          class="glass-card min-w-0 rounded-[20px] border border-emerald-300/16 bg-[linear-gradient(180deg,rgba(16,185,129,0.16),rgba(255,255,255,0.04))] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[22px] sm:rounded-[24px] sm:p-5"
-        >
-          <p
-            class="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-200 sm:text-xs sm:tracking-[0.2em]"
-          >
-            {{ i18n.t('trade.dashboard.cards.openTrades') }}
-          </p>
-          <p class="mt-3 text-2xl font-semibold text-emerald-100 sm:text-3xl">
-            {{ analytics().openTrades }}
-          </p>
-        </article>
+          <span class="stat-badge">
+            PNL
+          </span>
+        </div>
 
-        <article
-          class="glass-card min-w-0 rounded-[20px] border border-blue-300/16 bg-[linear-gradient(180deg,rgba(59,130,246,0.16),rgba(255,255,255,0.04))] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[22px] sm:rounded-[24px] sm:p-5"
-        >
-          <p
-            class="text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-200 sm:text-xs sm:tracking-[0.2em]"
-          >
-            {{ i18n.t('trade.dashboard.cards.closedTrades') }}
-          </p>
-          <p class="mt-3 text-2xl font-semibold text-blue-100 sm:text-3xl">
-            {{ analytics().closedTrades }}
-          </p>
-        </article>
+        <div class="stat-label">
+          {{ i18n.t('trade.dashboard.cards.estimatedPnl') }}
+        </div>
 
-        <article
-          class="glass-card glass-panel-soft group min-w-0 rounded-[20px] p-4 transition-all duration-300 hover:translate-y-[-2px] hover:shadow-[0_20px_60px_rgba(0,0,0,0.35)] sm:rounded-[24px] sm:p-5"
-        >
-          <p
-            class="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 sm:text-xs sm:tracking-[0.2em]"
-          >
-            {{ i18n.t('trade.dashboard.cards.mostTraded') }}
-          </p>
+        <div class="stat-value stat-value--pnl">
+          {{ analytics().estimatedPnl ?? 'N/A' }}
+        </div>
 
-          <p
-            class="mt-3 break-words text-2xl font-semibold text-white transition-colors duration-300 group-hover:text-white sm:text-3xl"
-          >
-            {{ analytics().mostTradedSymbol }}
-          </p>
-        </article>
+        <div class="stat-footer">
+          {{ i18n.t('trade.dashboard.cards.pnlNote', {
+            count: analytics().pnlTradeCount
+          }) }}
+        </div>
 
-        <article
-          class="glass-card min-w-0 rounded-[20px] border border-amber-300/16 bg-[linear-gradient(180deg,rgba(245,158,11,0.16),rgba(255,255,255,0.04))] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[22px] sm:col-span-2 sm:rounded-[24px] sm:p-5 2xl:col-span-1"
-        >
-          <p
-            class="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-200 sm:text-xs sm:tracking-[0.2em]"
-          >
-            {{ i18n.t('trade.dashboard.cards.estimatedPnl') }}
-          </p>
+      </article>
 
-          <p
-            class="mt-3 break-all text-xl font-semibold leading-tight sm:text-2xl lg:text-3xl"
-            [ngClass]="(analytics().estimatedPnl ?? 0) >= 0 ? 'text-emerald-200' : 'text-rose-200'"
-          >
-            {{ analytics().estimatedPnl ?? 'N/A' }}
-          </p>
+    </section>
 
-          <p class="mt-2 text-xs leading-5 text-amber-100/80">
-            {{ i18n.t('trade.dashboard.cards.pnlNote', { count: analytics().pnlTradeCount }) }}
-          </p>
-        </article>
-      </div>
 
-      <div class="animate-stagger-3 mt-5 grid min-w-0 gap-4 sm:mt-6 2xl:grid-cols-[1.5fr_1fr_1fr]">
-        <article class="glass-panel-soft min-w-0 rounded-[20px] p-4 sm:rounded-[24px] sm:p-5">
-          <h3 class="text-base font-semibold text-white sm:text-lg">
-            {{ i18n.t('trade.dashboard.charts.tradesOverTime') }}
-          </h3>
-          <p class="text-sm text-slate-400">
-            {{ i18n.t('trade.dashboard.charts.tradesOverTimeDescription') }}
-          </p>
+    <!-- CHART AREA -->
+    <section class="charts-grid">
 
-          <div class="mt-5 min-w-0 overflow-x-auto pb-2">
-            <div class="flex w-max min-w-full items-end gap-3 sm:gap-4">
-              @for (point of tradesOverTime(); track point.label) {
-                <div class="flex min-w-[44px] flex-1 flex-col items-center gap-2">
-                  <div class="flex h-32 w-full items-end sm:h-40">
-                    <div
-                      class="w-full rounded-t-2xl bg-gradient-to-t from-blue-500 to-cyan-400"
-                      [style.height.%]="getBarHeight(point.value, tradesOverTime())"
-                    ></div>
-                  </div>
-                  <span class="whitespace-nowrap text-xs font-medium text-slate-400">
-                    {{ point.label }}
-                  </span>
-                  <span class="text-xs font-semibold text-slate-200">
-                    {{ point.value }}
-                  </span>
-                </div>
-              }
+      <!-- TRADES OVER TIME -->
+      <article class="chart-card chart-card--large">
+
+        <div class="chart-header">
+
+          <div>
+            <div class="chart-kicker">
+              <span>★</span>
+              TRADING JOURNEY
             </div>
+
+            <h2>
+              {{ i18n.t('trade.dashboard.charts.tradesOverTime') }}
+            </h2>
+
+            <p>
+              {{ i18n.t('trade.dashboard.charts.tradesOverTimeDescription') }}
+            </p>
           </div>
-        </article>
 
-        <article class="glass-panel-soft min-w-0 rounded-[20px] p-4 sm:rounded-[24px] sm:p-5">
-          <h3 class="text-base font-semibold text-white sm:text-lg">
-            {{ i18n.t('trade.dashboard.charts.symbolDistribution') }}
-          </h3>
-          <p class="text-sm text-slate-400">
-            {{ i18n.t('trade.dashboard.charts.symbolDistributionDescription') }}
-          </p>
+          <div class="chart-mark">
+            {{ selectedRange() }}
+          </div>
 
-          <div class="mt-5 space-y-4">
-            @for (item of symbolDistribution(); track item.label) {
-              <div class="space-y-2">
-                <div class="flex items-start justify-between gap-3 text-sm">
-                  <span class="min-w-0 break-words font-medium text-slate-200">
-                    {{ item.label }}
-                  </span>
-                  <span class="shrink-0 text-slate-400">
-                    {{ item.value }}
-                  </span>
-                </div>
-                <div class="h-3 rounded-full bg-white/10">
-                  <div
-                    class="h-3 rounded-full bg-white/90"
-                    [style.width.%]="getBarHeight(item.value, symbolDistribution())"
-                  ></div>
-                </div>
+        </div>
+
+
+        <div class="bar-chart">
+
+          @for (point of tradesOverTime(); track point.label) {
+
+            <div class="bar-column">
+
+              <div class="bar-value">
+                {{ point.value }}
               </div>
-            } @empty {
-              <p class="text-sm text-slate-400">
-                {{ i18n.t('trade.dashboard.charts.noSymbolData') }}
-              </p>
-            }
-          </div>
-        </article>
 
-        <article class="glass-panel-soft min-w-0 rounded-[20px] p-4 sm:rounded-[24px] sm:p-5">
-          <h3 class="text-base font-semibold text-white sm:text-lg">
-            {{ i18n.t('trade.dashboard.charts.sideDistribution') }}
-          </h3>
-          <p class="text-sm text-slate-400">
-            {{ i18n.t('trade.dashboard.charts.sideDistributionDescription') }}
-          </p>
+              <div class="bar-track">
 
-          <div class="mt-5 space-y-4">
-            @for (item of sideDistribution(); track item.label) {
-              <div class="space-y-2">
-                <div class="flex items-center justify-between gap-3 text-sm">
-                  <span class="font-medium text-slate-200">
-                    {{ formatSideLabel(item.label) }}
-                  </span>
-                  <span class="shrink-0 text-slate-400">
-                    {{ item.value }}
-                  </span>
+                <div
+                  class="bar-fill"
+                  [style.height.%]="getBarHeight(
+                    point.value,
+                    tradesOverTime()
+                  )"
+                >
                 </div>
-                <div class="h-3 rounded-full bg-white/10">
-                  <div
-                    class="h-3 rounded-full transition-all duration-300"
-                    [ngClass]="item.label === 'BUY' ? 'bg-emerald-400' : 'bg-rose-400'"
-                    [style.width.%]="getBarHeight(item.value, sideDistribution())"
-                  ></div>
-                </div>
+
               </div>
-            } @empty {
-              <p class="text-sm text-slate-400">
-                {{ i18n.t('trade.dashboard.charts.noSideData') }}
-              </p>
-            }
-          </div>
-        </article>
-      </div>
-    </div>
+
+              <span class="bar-label">
+                {{ point.label }}
+              </span>
+
+            </div>
+
+          }
+
+        </div>
+
+      </article>
+
+
+      <!-- SYMBOL -->
+      <article class="chart-card">
+
+        <div class="chart-kicker">
+          <span>◆</span>
+          SYMBOLS
+        </div>
+
+        <h2>
+          {{ i18n.t('trade.dashboard.charts.symbolDistribution') }}
+        </h2>
+
+        <p>
+          {{ i18n.t('trade.dashboard.charts.symbolDistributionDescription') }}
+        </p>
+
+
+        <div class="distribution-list">
+
+          @for (item of symbolDistribution(); track item.label) {
+
+            <div class="distribution-item">
+
+              <div class="distribution-header">
+
+                <span>
+                  {{ item.label }}
+                </span>
+
+                <strong>
+                  {{ item.value }}
+                </strong>
+
+              </div>
+
+              <div class="distribution-track">
+
+                <div
+                  class="distribution-fill distribution-fill--green"
+                  [style.width.%]="getBarHeight(
+                    item.value,
+                    symbolDistribution()
+                  )"
+                >
+                </div>
+
+              </div>
+
+            </div>
+
+          } @empty {
+
+            <div class="empty-chart">
+              <span>○</span>
+              {{ i18n.t('trade.dashboard.charts.noSymbolData') }}
+            </div>
+
+          }
+
+        </div>
+
+      </article>
+
+
+      <!-- BUY / SELL -->
+      <article class="chart-card">
+
+        <div class="chart-kicker">
+          <span>⚔</span>
+          POSITION SIDE
+        </div>
+
+        <h2>
+          {{ i18n.t('trade.dashboard.charts.sideDistribution') }}
+        </h2>
+
+        <p>
+          {{ i18n.t('trade.dashboard.charts.sideDistributionDescription') }}
+        </p>
+
+
+        <div class="distribution-list">
+
+          @for (item of sideDistribution(); track item.label) {
+
+            <div class="distribution-item">
+
+              <div class="distribution-header">
+
+                <span>
+                  {{ formatSideLabel(item.label) }}
+                </span>
+
+                <strong>
+                  {{ item.value }}
+                </strong>
+
+              </div>
+
+              <div class="distribution-track">
+
+                <div
+                  class="distribution-fill"
+                  [ngClass]="
+                    item.label === 'BUY'
+                      ? 'distribution-fill--buy'
+                      : 'distribution-fill--sell'
+                  "
+                  [style.width.%]="getBarHeight(
+                    item.value,
+                    sideDistribution()
+                  )"
+                >
+                </div>
+
+              </div>
+
+            </div>
+
+          } @empty {
+
+            <div class="empty-chart">
+              <span>○</span>
+              {{ i18n.t('trade.dashboard.charts.noSideData') }}
+            </div>
+
+          }
+
+        </div>
+
+      </article>
+
+    </section>
+
   }
+
 </section>

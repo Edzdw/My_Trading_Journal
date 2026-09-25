@@ -1,0 +1,296 @@
+:host {
+  display: block;
+}
+
+.register-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ─────────────────────────────
+   Heading
+───────────────────────────── */
+
+.register-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.register-eyebrow {
+  color: #2e8b57;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.register-heading h2 {
+  margin: 0;
+
+  color: #20251f;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.register-heading p {
+  margin: 2px 0 0;
+
+  color: #70786e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────
+   Error
+───────────────────────────── */
+
+.register-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  padding: 12px 14px;
+
+  border: 2px solid #e94b4b;
+  background: #fbe2e0;
+
+  color: #b83232;
+  font-size: 12px;
+}
+
+.register-error > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.register-error strong {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.register-error span:not(.error-icon) {
+  line-height: 1.4;
+}
+
+.error-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  background: #e94b4b;
+  color: white;
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+/* ─────────────────────────────
+   Form
+───────────────────────────── */
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field-label {
+  color: #596257;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.field input {
+  width: 100%;
+  padding: 13px 14px;
+
+  border: 2px solid #d8d1c0;
+  border-radius: 8px;
+
+  background: #f7f3e8;
+  color: #20251f;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.field input::placeholder {
+  color: #9a9f96;
+}
+
+.field input:hover {
+  border-color: #b9c8b9;
+}
+
+.field input:focus {
+  border-color: #2e8b57;
+  background: #fffdf7;
+
+  box-shadow:
+    3px 3px 0 rgba(46, 139, 87, 0.15);
+}
+
+.field-error {
+  color: #c53b3b;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* ─────────────────────────────
+   Submit
+───────────────────────────── */
+
+.auth-submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  padding: 14px 16px;
+
+  border: 2px solid #236b43;
+  border-radius: 8px;
+
+  background: #2e8b57;
+  color: white;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  box-shadow:
+    4px 4px 0 #236b43;
+
+  transition:
+    transform 100ms ease,
+    box-shadow 100ms ease,
+    background-color 100ms ease;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: #379b63;
+}
+
+.auth-submit:active:not(:disabled) {
+  transform: translate(3px, 3px);
+
+  box-shadow:
+    1px 1px 0 #236b43;
+}
+
+.auth-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.submit-arrow {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.submit-loading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.loading-dot {
+  width: 10px;
+  height: 10px;
+
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-top-color: transparent;
+  border-radius: 50%;
+
+  animation: registerSpin 600ms linear infinite;
+}
+
+@keyframes registerSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─────────────────────────────
+   Login link
+───────────────────────────── */
+
+.register-login {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding-top: 18px;
+
+  border-top: 1px solid #d8d1c0;
+
+  color: #70786e;
+  font-size: 12px;
+}
+
+.register-login a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  color: #2e8b57;
+
+  font-weight: 900;
+  text-decoration: none;
+
+  transition: color 120ms ease;
+}
+
+.register-login a:hover {
+  color: #236b43;
+}
+
+.register-login a span {
+  font-size: 15px;
+}
+
+/* ─────────────────────────────
+   Mobile
+───────────────────────────── */
+
+@media (max-width: 480px) {
+  .register-heading h2 {
+    font-size: 24px;
+  }
+
+  .register-login {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

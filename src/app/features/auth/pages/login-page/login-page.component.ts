@@ -11,7 +11,8 @@ import { AuthService } from '../../data-access/auth.service';
 @Component({
   selector: 'app-login-page',
   imports: [ReactiveFormsModule, RouterLink, AuthShellComponent],
-  templateUrl: './login-page.component.html'
+  templateUrl: './login-page.component.html',
+  styleUrl: './login-page.component.css'
 })
 export class LoginPageComponent {
   protected readonly authService = inject(AuthService);

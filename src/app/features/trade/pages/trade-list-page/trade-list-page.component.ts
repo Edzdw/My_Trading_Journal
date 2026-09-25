@@ -18,9 +18,10 @@ import {
 
 @Component({
   selector: 'app-trade-list-page',
-  imports: [DatePipe, NgClass, RouterLink],
+  imports: [DatePipe, RouterLink],
   providers: [DecimalPipe],
-  templateUrl: './trade-list-page.component.html'
+  templateUrl: './trade-list-page.component.html',
+  styleUrl: './trade-list-page.component.css'
 })
 
 export class TradeListPageComponent implements OnInit {

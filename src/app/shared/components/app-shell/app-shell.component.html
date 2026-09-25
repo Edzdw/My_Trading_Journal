@@ -1,0 +1,29 @@
+<div class="app-shell">
+  <div class="app-background">
+    <div class="background-shape background-shape--green"></div>
+    <div class="background-shape background-shape--yellow"></div>
+    <div class="background-shape background-shape--red"></div>
+  </div>
+
+  <div class="app-layout">
+    <app-header (menuClick)="toggleSidebar()" />
+
+    <div class="app-body">
+      <aside class="app-sidebar-area" [class.open]="sidebarOpen()">
+        <app-sidebar (close)="closeSidebar()" />
+      </aside>
+
+      <main class="app-workspace">
+        <div class="app-content">
+          <router-outlet />
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="mobile-overlay" [class.visible]="sidebarOpen()" (click)="closeSidebar()"></div>
+
+  <aside class="mobile-sidebar" (close)="closeSidebar()" [class.open]="sidebarOpen()">
+    <app-sidebar (close)="closeSidebar()" (navigateItem)="closeSidebar()" />
+  </aside>
+</div>

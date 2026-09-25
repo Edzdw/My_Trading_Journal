@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, computed, inject, Injectable, signal } from '@angular/core';
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { AUTH_STORAGE_KEYS } from '../../../core/config/auth-storage.config';
 import { AuthState } from '../../../core/types/auth-state.type';
@@ -76,6 +76,16 @@ export class AuthService {
 
   register(payload: RegisterRequest): Observable<AuthResponse> {
     return this.authApi.register(payload).pipe(tap((response) => this.setSession(response)));
+  }
+
+  refreshSession(): Observable<AuthResponse> {
+    const refreshToken = this.getRefreshToken();
+
+    if (!refreshToken) {
+      return throwError(() => new Error('Refresh token is unavailable'));
+    }
+
+    return this.authApi.refresh(refreshToken).pipe(tap((response) => this.setSession(response)));
   }
 
   logout(): Observable<void> {

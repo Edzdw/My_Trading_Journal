@@ -20,6 +20,10 @@ export class AuthApiService {
     return this.api.post<AuthResponse, RegisterRequest>(`${this.authPath}/register`, payload);
   }
 
+  refresh(refreshToken: string): Observable<AuthResponse> {
+    return this.api.post<AuthResponse, { refreshToken: string }>(`${this.authPath}/refresh`, { refreshToken });
+  }
+
   logout(refreshToken: string): Observable<void> {
     return this.api.post<void, { refreshToken: string }>(`${this.authPath}/logout`, { refreshToken });
   }

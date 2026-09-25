@@ -9,8 +9,10 @@ import { buildTradeForm } from '../../utils/trade-form.util';
 
 @Component({
   selector: 'app-trade-edit-page',
+  standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './trade-edit-page.component.html'
+  templateUrl: './trade-edit-page.component.html',
+  styleUrl: './trade-edit-page.component.css'
 })
 export class TradeEditPageComponent {
   protected readonly i18n = inject(I18nService);

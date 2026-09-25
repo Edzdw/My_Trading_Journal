@@ -1,0 +1,63 @@
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.language-label {
+  color: #70786e;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.language-control {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  background: #f1ede2;
+  border: 2px solid #292d28;
+  border-radius: 10px;
+  box-shadow: 2px 2px 0 #292d28;
+}
+
+.language-button {
+  min-width: 38px;
+  min-height: 30px;
+  padding: 0.3rem 0.55rem;
+
+  background: transparent;
+  color: #70786e;
+
+  border: 0;
+  border-radius: 7px;
+
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.language-button:hover:not(.active) {
+  background: #fffdf7;
+  color: #20251f;
+}
+
+.language-button.active {
+  background: #ff4f81;
+  color: #ffffff;
+  box-shadow: 2px 2px 0 #c92f5d;
+}
+
+.language-button:active {
+  transform: translate(1px, 1px);
+}
