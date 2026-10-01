@@ -1,6 +1,12 @@
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { CreateTradeRequest, Trade, TradeMarketType, TradeSide, UpdateTradeRequest } from '../types/trade.models';
+import {
+  CreateTradeRequest,
+  Trade,
+  TradeMarketType,
+  TradeSide,
+  UpdateTradeRequest,
+} from '../types/trade.models';
 
 export interface TradeFormValue {
   symbol: string;
@@ -21,14 +27,15 @@ export function buildTradeForm(formBuilder: FormBuilder, trade?: Trade) {
     marketType: [trade?.marketType ?? 'CRYPTO', [Validators.required]],
     side: [trade?.side ?? 'BUY', [Validators.required]],
     entryPrice: [trade?.entryPrice ?? '', [Validators.required]],
-    stopLoss: [trade?.stopLoss ?? '', [Validators.required]],
-    takeProfit: [trade?.takeProfit ?? '', [Validators.required]],
+    stopLoss: [trade?.stopLoss ?? ''],
+    takeProfit: [trade?.takeProfit ?? ''],
     quantity: [trade?.quantity ?? '', [Validators.required]],
     openTime: [trade ? toDateTimeLocalValue(trade.openTime) : '', [Validators.required]],
     thesis: [trade?.thesis ?? ''],
-    note: [trade?.note ?? '']
+    note: [trade?.note ?? ''],
   });
 }
+
 
 export function mapTradeFormValueToCreateRequest(formValue: TradeFormValue): CreateTradeRequest {
   return {
@@ -36,17 +43,26 @@ export function mapTradeFormValueToCreateRequest(formValue: TradeFormValue): Cre
     marketType: formValue.marketType,
     side: formValue.side,
     entryPrice: formValue.entryPrice.trim(),
-    stopLoss: formValue.stopLoss.trim(),
-    takeProfit: formValue.takeProfit.trim(),
+    stopLoss: nullableNumber(formValue.stopLoss),
+    takeProfit: nullableNumber(formValue.takeProfit),
     quantity: formValue.quantity.trim(),
     openTime: new Date(formValue.openTime).toISOString(),
     thesis: nullableText(formValue.thesis),
-    note: nullableText(formValue.note)
+    note: nullableText(formValue.note),
   };
 }
 
 export function mapTradeFormValueToUpdateRequest(formValue: TradeFormValue): UpdateTradeRequest {
   return mapTradeFormValueToCreateRequest(formValue);
+}
+
+export function mapTradeJournalValueToUpdateRequest(
+  formValue: Pick<TradeFormValue, 'thesis' | 'note'>,
+): UpdateTradeRequest {
+  return {
+    thesis: nullableText(formValue.thesis),
+    note: nullableText(formValue.note),
+  };
 }
 
 export function toDateTimeLocalValue(isoDateTime: string): string {
@@ -58,6 +74,11 @@ export function toDateTimeLocalValue(isoDateTime: string): string {
 }
 
 function nullableText(value: string): string | null {
+  const trimmedValue = value.trim();
+  return trimmedValue.length > 0 ? trimmedValue : null;
+}
+
+function nullableNumber(value: string): string | null {
   const trimmedValue = value.trim();
   return trimmedValue.length > 0 ? trimmedValue : null;
 }

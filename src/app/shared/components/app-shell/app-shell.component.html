@@ -21,9 +21,20 @@
     </div>
   </div>
 
-  <div class="mobile-overlay" [class.visible]="sidebarOpen()" (click)="closeSidebar()"></div>
+  <div
+    class="mobile-overlay"
+    [class.visible]="sidebarOpen()"
+    (click)="closeSidebar()"
+  ></div>
 
-  <aside class="mobile-sidebar" (close)="closeSidebar()" [class.open]="sidebarOpen()">
-    <app-sidebar (close)="closeSidebar()" (navigateItem)="closeSidebar()" />
+  <aside
+    class="mobile-sidebar"
+    (close)="closeSidebar()"
+    [class.open]="sidebarOpen()"
+  >
+    <app-sidebar
+      (close)="closeSidebar()"
+      (navigateItem)="closeSidebar()"
+    />
   </aside>
 </div>

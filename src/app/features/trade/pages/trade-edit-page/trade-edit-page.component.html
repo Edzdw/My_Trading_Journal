@@ -1,5 +1,4 @@
 <section class="edit-page">
-
   <!-- HERO -->
   <div class="edit-hero">
     <div class="edit-hero__main">
@@ -22,10 +21,7 @@
         EDITING TRADE
       </div>
 
-      <a
-        routerLink="/app/trades/list"
-        class="hud-button hud-button--ghost"
-      >
+      <a routerLink="/app/trades/list" class="hud-button hud-button--ghost">
         {{ i18n.t('common.actions.backToTrades') }}
       </a>
     </div>
@@ -45,7 +41,6 @@
 
   <!-- LOADING -->
   @if (isLoading()) {
-
     <div class="loading-panel">
       <div class="loading-icon">↻</div>
 
@@ -54,22 +49,12 @@
         <p>Loading trade data...</p>
       </div>
     </div>
-
   } @else {
-
-    <form
-      class="edit-form"
-      [formGroup]="tradeForm"
-      (ngSubmit)="onSubmit()"
-    >
-
+    <form class="edit-form" [formGroup]="tradeForm" (ngSubmit)="onSubmit()">
       <!-- IDENTITY -->
       <section class="form-section form-section--blue">
-
         <div class="form-section__header">
-          <div class="step-badge step-badge--blue">
-            01
-          </div>
+          <div class="step-badge step-badge--blue">01</div>
 
           <div>
             <p class="section-kicker section-kicker--blue">
@@ -83,15 +68,12 @@
         </div>
 
         <div class="field-grid field-grid--2">
-
           <label class="field">
             <span class="field__label">
               {{ i18n.t('trade.form.fields.symbol') }}
             </span>
 
-            <span class="field__hint">
-              Market symbol
-            </span>
+            <span class="field__hint">Market symbol</span>
 
             <input
               type="text"
@@ -105,9 +87,7 @@
               {{ i18n.t('trade.form.fields.marketType') }}
             </span>
 
-            <span class="field__hint">
-              Asset class
-            </span>
+            <span class="field__hint">Asset class</span>
 
             <select
               formControlName="marketType"
@@ -119,18 +99,13 @@
               <option value="FUTURES">Futures</option>
             </select>
           </label>
-
         </div>
-
       </section>
 
       <!-- EXECUTION -->
       <section class="form-section form-section--green">
-
         <div class="form-section__header">
-          <div class="step-badge step-badge--green">
-            02
-          </div>
+          <div class="step-badge step-badge--green">02</div>
 
           <div>
             <p class="section-kicker section-kicker--green">
@@ -144,13 +119,10 @@
         </div>
 
         <div class="field-grid field-grid--4">
-
           <label class="field">
             <span class="field__label">Side</span>
 
-            <span class="field__hint">
-              Direction
-            </span>
+            <span class="field__hint">Direction</span>
 
             <select
               formControlName="side"
@@ -164,9 +136,7 @@
           <label class="field">
             <span class="field__label">Open Time</span>
 
-            <span class="field__hint">
-              Entry timestamp
-            </span>
+            <span class="field__hint">Entry timestamp</span>
 
             <input
               type="datetime-local"
@@ -178,9 +148,7 @@
           <label class="field">
             <span class="field__label">Entry</span>
 
-            <span class="field__hint">
-              Entry price
-            </span>
+            <span class="field__hint">Entry price</span>
 
             <input
               type="text"
@@ -192,9 +160,7 @@
           <label class="field">
             <span class="field__label">Qty</span>
 
-            <span class="field__hint">
-              Position size
-            </span>
+            <span class="field__hint">Position size</span>
 
             <input
               type="text"
@@ -202,18 +168,13 @@
               class="hud-input"
             />
           </label>
-
         </div>
-
       </section>
 
       <!-- RISK -->
       <section class="form-section form-section--yellow">
-
         <div class="form-section__header">
-          <div class="step-badge step-badge--yellow">
-            03
-          </div>
+          <div class="step-badge step-badge--yellow">03</div>
 
           <div>
             <p class="section-kicker section-kicker--yellow">
@@ -227,7 +188,6 @@
         </div>
 
         <div class="field-grid field-grid--2">
-
           <label class="field">
             <span class="field__label">Stop Loss</span>
 
@@ -245,9 +205,7 @@
           <label class="field">
             <span class="field__label">Take Profit</span>
 
-            <span class="field__hint">
-              Target price
-            </span>
+            <span class="field__hint">Target price</span>
 
             <input
               type="text"
@@ -255,18 +213,13 @@
               class="hud-input"
             />
           </label>
-
         </div>
-
       </section>
 
       <!-- JOURNAL -->
       <section class="form-section form-section--journal">
-
         <div class="form-section__header">
-          <div class="step-badge step-badge--journal">
-            04
-          </div>
+          <div class="step-badge step-badge--journal">04</div>
 
           <div>
             <p class="section-kicker section-kicker--journal">
@@ -280,7 +233,6 @@
         </div>
 
         <div class="field-grid field-grid--2">
-
           <label class="field">
             <span class="field__label">Thesis</span>
 
@@ -308,58 +260,302 @@
               class="hud-input hud-textarea"
             ></textarea>
           </label>
-
         </div>
-
       </section>
 
       <!-- ACTION -->
       <section class="action-panel">
+        <!-- Primary action -->
+        <div class="action-panel__main">
+          <div class="action-panel__info">
+            <div class="action-panel__icon">✓</div>
 
-        <div class="action-panel__info">
-          <div class="action-panel__icon">
-            ✓
+            <div>
+              @if (tradeStatus() === 'CLOSED') {
+                <strong>Review your journal</strong>
+                <p>
+                  Execution details are locked for closed trades.
+                </p>
+              } @else {
+                <strong>Review your trade</strong>
+                <p>Save any changes you've made to this trade.</p>
+              }
+            </div>
           </div>
 
-          <div>
-            <strong>Ready to update?</strong>
-            <p>
-              Review your changes before saving this trade.
-            </p>
+          <div class="action-panel__main-buttons">
+            <a
+              routerLink="/app/trades/list"
+              class="hud-button hud-button--ghost"
+            >
+              {{ i18n.t('common.actions.backToTrades') }}
+            </a>
+
+            <button
+              type="submit"
+              class="hud-button hud-button--primary"
+              [disabled]="isSubmitting()"
+            >
+              <span>
+                {{
+                  isSubmitting()
+                    ? i18n.t('trade.edit.submitting')
+                    : i18n.t('trade.edit.submit')
+                }}
+              </span>
+
+              @if (!isSubmitting()) {
+                <span class="button-arrow">→</span>
+              }
+            </button>
           </div>
         </div>
 
-        <div class="action-panel__buttons">
+        <!-- Trade lifecycle -->
+        @if (tradeStatus() === 'OPEN') {
+          <div class="action-panel__lifecycle">
+            <div class="action-panel__lifecycle-info">
+              <span
+                class="section-kicker section-kicker--danger"
+              >
+                TRADE LIFECYCLE
+              </span>
 
-          <a
-            routerLink="/app/trades/list"
-            class="hud-button hud-button--ghost"
-          >
-            {{ i18n.t('common.actions.backToTrades') }}
-          </a>
+              <strong>This trade is currently OPEN</strong>
 
-          <button
-            type="submit"
-            class="hud-button hud-button--primary"
-            [disabled]="isSubmitting()"
+              <p>
+                Closing this trade will move it to your trading history.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="hud-button hud-button--danger"
+              [disabled]="isSubmitting()"
+              (click)="openCloseDialog()"
+            >
+              <span>Close Trade</span>
+
+              @if (!isSubmitting()) {
+                <span class="button-arrow">×</span>
+              }
+            </button>
+          </div>
+        }
+
+        @if (tradeStatus() === 'CLOSED') {
+          <div
+            class="action-panel__lifecycle action-panel__lifecycle--closed"
           >
-            <span>
-              {{ isSubmitting()
-                ? i18n.t('trade.edit.submitting')
-                : i18n.t('trade.edit.submit') }}
+            <div class="action-panel__lifecycle-info">
+              <span class="section-kicker">
+                TRADE LIFECYCLE
+              </span>
+
+              <strong>This trade is closed</strong>
+
+              <p>
+                Execution details are locked. You can still update your
+                journal.
+              </p>
+            </div>
+
+            <span class="hud-chip hud-chip--blue">
+              <span class="hud-chip__dot"></span>
+              CLOSED
             </span>
-
-            @if (!isSubmitting()) {
-              <span class="button-arrow">→</span>
-            }
-          </button>
-
-        </div>
-
+          </div>
+        }
       </section>
-
     </form>
 
-  }
+    @if (isCloseDialogOpen()) {
+      <div
+        class="close-dialog-backdrop"
+        (click)="closeCloseDialog()"
+      >
+        <section
+          class="close-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="close-dialog-title"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="close-dialog__header">
+            <div>
+              <span
+                class="section-kicker section-kicker--danger"
+              >
+                TRADE LIFECYCLE
+              </span>
 
+              <h3
+                id="close-dialog-title"
+                class="close-dialog__title"
+              >
+                Close Trade
+              </h3>
+
+              <p class="close-dialog__description">
+                Select how this trade was exited.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="close-dialog__close"
+              [disabled]="isSubmitting()"
+              (click)="closeCloseDialog()"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="close-dialog__trade">
+            <span>{{ trade()?.symbol }}</span>
+
+            <span class="hud-chip hud-chip--blue">
+              {{ trade()?.side }}
+            </span>
+
+            <span>
+              Entry {{ trade()?.entryPrice }}
+            </span>
+          </div>
+
+          <div class="close-dialog__options">
+            @if (trade()?.takeProfit != null) {
+              <button
+                type="button"
+                class="close-option"
+                [class.close-option--selected]="
+                  closeExitReason() === 'TP'
+                "
+                [disabled]="isSubmitting()"
+                (click)="selectCloseReason('TP')"
+              >
+                <span class="close-option__radio">
+                  @if (closeExitReason() === 'TP') {
+                    <span></span>
+                  }
+                </span>
+
+                <span class="close-option__content">
+                  <strong>Take Profit</strong>
+                  <small>Close at your configured target</small>
+                </span>
+
+                <span class="close-option__price">
+                  {{ trade()?.takeProfit }}
+                </span>
+              </button>
+            }
+
+            @if (trade()?.stopLoss != null) {
+              <button
+                type="button"
+                class="close-option"
+                [class.close-option--selected]="
+                  closeExitReason() === 'SL'
+                "
+                [disabled]="isSubmitting()"
+                (click)="selectCloseReason('SL')"
+              >
+                <span class="close-option__radio">
+                  @if (closeExitReason() === 'SL') {
+                    <span></span>
+                  }
+                </span>
+
+                <span class="close-option__content">
+                  <strong>Stop Loss</strong>
+                  <small>Close at your configured stop</small>
+                </span>
+
+                <span class="close-option__price">
+                  {{ trade()?.stopLoss }}
+                </span>
+              </button>
+            }
+
+            <button
+              type="button"
+              class="close-option"
+              [class.close-option--selected]="
+                closeExitReason() === 'MANUAL'
+              "
+              [disabled]="isSubmitting()"
+              (click)="selectCloseReason('MANUAL')"
+            >
+              <span class="close-option__radio">
+                @if (closeExitReason() === 'MANUAL') {
+                  <span></span>
+                }
+              </span>
+
+              <span class="close-option__content">
+                <strong>Manual Exit</strong>
+                <small>Enter the actual exit price</small>
+              </span>
+            </button>
+          </div>
+
+          @if (closeExitReason() === 'MANUAL') {
+            <div class="close-dialog__manual">
+              <label class="field">
+                <span class="field__label">Exit Price</span>
+
+                <span class="field__hint">
+                  The price at which the position was actually closed
+                </span>
+
+                <input
+                  type="text"
+                  class="hud-input"
+                  [value]="closeExitPrice()"
+                  [disabled]="isSubmitting()"
+                  (input)="
+                    closeExitPrice.set(
+                      $any($event.target).value
+                    )
+                  "
+                  placeholder="Enter exit price"
+                />
+              </label>
+            </div>
+          }
+
+          <div class="close-dialog__actions">
+            <button
+              type="button"
+              class="hud-button hud-button--ghost"
+              [disabled]="isSubmitting()"
+              (click)="closeCloseDialog()"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              class="hud-button hud-button--danger"
+              [disabled]="
+                isSubmitting() ||
+                !closeExitReason() ||
+                (closeExitReason() === 'MANUAL' &&
+                  !closeExitPrice().trim())
+              "
+              (click)="confirmCloseTrade()"
+            >
+              @if (isSubmitting()) {
+                <span>Closing...</span>
+              } @else {
+                <span>Confirm Close</span>
+                <span class="button-arrow">×</span>
+              }
+            </button>
+          </div>
+        </section>
+      </div>
+    }
+  }
 </section>

@@ -11,6 +11,7 @@ import {
 } from '@angular/router';
 
 import { I18nService } from '../../../core/services/i18n.service';
+import {PageMascotComponent} from '../app-page-mascot/app-page-mascot.component'
 
 @Component({
   selector: 'app-sidebar',
@@ -18,6 +19,7 @@ import { I18nService } from '../../../core/services/i18n.service';
   imports: [
     RouterLink,
     RouterLinkActive,
+    PageMascotComponent,
   ],
   templateUrl: './app-sidebar.component.html',
   styleUrl: './app-sidebar.component.css',

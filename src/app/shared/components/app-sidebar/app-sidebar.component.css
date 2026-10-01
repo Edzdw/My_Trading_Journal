@@ -9,8 +9,9 @@
   flex-direction: column;
 
   width: 260px;
-  height: 100%;
   min-width: 260px;
+  min-height: 0;
+  height: 100%;
 
   padding: 14px;
 
@@ -24,6 +25,8 @@
 
   color: #20251f;
 }
+
+
 
 /* =========================================================
    HEADER
@@ -145,7 +148,7 @@
   background: #f1ede2;
 }
 
-.sidebar-intro > span {
+.sidebar-intro>span {
   display: block;
 
   color: #236b43;
@@ -170,7 +173,7 @@
 
 .sidebar-nav {
   flex: 1;
-
+  min-height: 0;
   margin-top: 18px;
 
   overflow-y: auto;
@@ -218,6 +221,65 @@
   font-size: 18px;
   font-weight: 500;
   line-height: 1;
+}
+
+.sidebar-mascot {
+  position: relative;
+
+  flex: 0 0 150px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  margin-top: 12px;
+  padding-top: 10px;
+
+  border-top: 1px solid #d8d1c0;
+
+  overflow: hidden;
+}
+
+.sidebar-mascot-label {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  color: #8a9185;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.sidebar-mascot app-page-mascot {
+  width: 115px;
+  height: 115px;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-mascot {
+    flex-basis: 125px;
+  }
+
+}
+
+@media (max-width: 768px) {
+  .sidebar-mascot {
+    flex-basis: 110px;
+  }
+
+  .sidebar-mascot-label {
+    top: 6px;
+    font-size: 6.5px;
+    letter-spacing: 0.08em;
+  }
+  .sidebar-mascot app-page-mascot {
+    padding-top: 15px
+  }
+
 }
 
 /* =========================================================
@@ -277,4 +339,26 @@
   color: #236b43;
 
   font-weight: 800;
+}
+
+@media (max-width: 1279px) {
+  .sidebar {
+    height: 100dvh;
+  }
+
+  .sidebar-header,
+  .sidebar-intro,
+  .sidebar-mascot {
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav {
+    flex: 1 1 0;
+  }
+
+  .sidebar-mascot-label {
+    top: 7px;
+    font-size: 7px;
+    letter-spacing: 0.1em;
+  }
 }

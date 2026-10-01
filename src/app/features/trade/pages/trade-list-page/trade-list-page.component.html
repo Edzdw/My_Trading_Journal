@@ -1,193 +1,1106 @@
 <section class="trade-list-page">
 
-  <!-- HEADER -->
-  <div class="page-header">
+  <!-- =====================================================
+       PAGE HEADER
+       ===================================================== -->
+
+  <header class="page-header">
+
     <div class="page-header__main">
+
       <div class="page-kicker">
         <span class="page-kicker__dot"></span>
-        {{ i18n.t('trade.nav.trades') }}
+        Trade Journal
       </div>
 
-      <h2 class="page-title">
+      <h1 class="page-title">
         {{ i18n.t('trade.list.title') }}
-      </h2>
+      </h1>
 
       <p class="page-description">
-        {{ i18n.t('trade.list.description') }}
+        Review, filter and manage your trading history.
       </p>
+
     </div>
 
     <div class="page-header__actions">
 
       <div class="range-switcher">
-        @for (range of ranges; track range) {
-          <button
-            type="button"
-            class="range-button"
-            [class.range-button--active]="selectedRange() === range"
-            (click)="onRangeChange(range)"
-          >
-            {{ i18n.t('trade.range.' + range) }}
-          </button>
-        }
+
+      @for (range of ranges; track range) {
+
+        <button
+          type="button"
+          class="range-button"
+          [class.range-button--active]="selectedRange() === range"
+          [class.range-button--all]="range === 'ALL'"
+          (click)="onRangeChange(range)"
+        >
+          {{ range === 'ALL' ? 'All History' : range }}
+        </button>
+
+      }
+
       </div>
 
       <a
         routerLink="/app/trades/new"
         class="button button--primary"
       >
-        <span class="button__icon">+</span>
-        {{ i18n.t('trade.list.createTrade') }}
+        <span class="button__icon">＋</span>
+        New Trade
       </a>
 
     </div>
-  </div>
+
+  </header>
 
 
-  <!-- ERROR -->
+  <!-- =====================================================
+       FILTER PANEL
+       ===================================================== -->
+
+  <section class="filter-panel">
+
+    <!-- MAIN TOOLBAR -->
+
+    <div class="filter-toolbar">
+
+      <!-- SEARCH -->
+
+      <div class="filter-search">
+
+        <span class="filter-search__icon">
+          ⌕
+        </span>
+
+        <input
+          id="trade-search"
+          type="text"
+          placeholder="Search symbol, position ID, order ID..."
+          [value]="search()"
+          (input)="onSearchInput($event)"
+          (keyup.enter)="applyFilters()"
+        />
+
+        @if (search()) {
+
+          <button
+            type="button"
+            class="filter-search__clear"
+            aria-label="Clear search"
+            (click)="search.set(''); applyFilters()"
+          >
+            ×
+          </button>
+
+        }
+
+      </div>
+
+
+      <!-- SYMBOL -->
+
+<div class="custom-select custom-select--symbol">
+
+  <button
+    type="button"
+    class="custom-select__trigger"
+    [class.custom-select__trigger--active]="
+      openDropdown() === 'symbol'
+    "
+    [disabled]="isLoadingOptions()"
+    (click)="toggleDropdown('symbol', $event)"
+  >
+
+    <span class="custom-select__content">
+
+      <span class="custom-select__label">
+        Symbol
+      </span>
+
+      <span class="custom-select__value">
+        {{ symbolLabel() }}
+      </span>
+
+    </span>
+
+    <span class="custom-select__chevron">
+      {{ openDropdown() === 'symbol' ? '⌃' : '⌄' }}
+    </span>
+
+  </button>
+
+
+  @if (openDropdown() === 'symbol') {
+
+    <div class="custom-select__menu custom-select__menu--symbol">
+
+      <!-- SYMBOL SEARCH -->
+
+      <div class="symbol-search">
+
+        <span class="symbol-search__icon">
+          ⌕
+        </span>
+
+        <input
+          type="text"
+          placeholder="Search symbols..."
+          [value]="symbolSearch()"
+          (input)="onSymbolSearch($event)"
+          (click)="$event.stopPropagation()"
+        />
+
+        @if (symbolSearch()) {
+
+          <button
+            type="button"
+            class="symbol-search__clear"
+            aria-label="Clear symbol search"
+            (click)="symbolSearch.set(''); $event.stopPropagation()"
+          >
+            ×
+          </button>
+
+        }
+
+      </div>
+
+
+      <!-- SYMBOL OPTIONS -->
+
+      <div class="custom-select__options">
+
+        <!-- ALL -->
+
+        <button
+          type="button"
+          class="custom-option"
+          [class.custom-option--selected]="!symbol()"
+          (click)="selectSymbol('')"
+        >
+
+          <span>
+            All symbols
+          </span>
+
+          @if (!symbol()) {
+
+            <span class="custom-option__check">
+              ✓
+            </span>
+
+          }
+
+        </button>
+
+
+        <!-- FILTERED SYMBOLS -->
+
+        @for (
+          item of filteredSymbols();
+          track item
+        ) {
+
+          <button
+            type="button"
+            class="custom-option"
+            [class.custom-option--selected]="symbol() === item"
+            (click)="selectSymbol(item)"
+          >
+
+            <span>
+              {{ item }}
+            </span>
+
+            @if (symbol() === item) {
+
+              <span class="custom-option__check">
+                ✓
+              </span>
+
+            }
+
+          </button>
+
+        }
+
+
+        <!-- NO RESULT -->
+
+        @if (
+          filteredSymbols().length === 0
+          && symbolSearch()
+        ) {
+
+          <div class="symbol-search__empty">
+            No symbols found
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  }
+
+</div>
+
+
+      <!-- SOURCE -->
+
+      <div class="custom-select">
+
+        <button
+          type="button"
+          class="custom-select__trigger"
+          [class.custom-select__trigger--active]="
+            openDropdown() === 'source'
+          "
+          [disabled]="isLoadingOptions()"
+          (click)="toggleDropdown('source', $event)"
+        >
+
+          <span class="custom-select__content">
+
+            <span class="custom-select__label">
+              Source
+            </span>
+
+            <span class="custom-select__value">
+              {{ sourceLabel() }}
+            </span>
+
+          </span>
+
+          <span class="custom-select__chevron">
+            {{ openDropdown() === 'source' ? '⌃' : '⌄' }}
+          </span>
+
+        </button>
+
+        @if (openDropdown() === 'source') {
+
+          <div class="custom-select__menu">
+
+            <button
+              type="button"
+              class="custom-option"
+              [class.custom-option--selected]="!source()"
+              (click)="selectSource('')"
+            >
+              <span>All sources</span>
+
+              @if (!source()) {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+            @for (
+              item of sources();
+              track item
+            ) {
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="source() === item"
+                (click)="selectSource(item)"
+              >
+                <span>{{ item }}</span>
+
+                @if (source() === item) {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- STATUS -->
+
+      <div class="custom-select">
+
+        <button
+          type="button"
+          class="custom-select__trigger"
+          [class.custom-select__trigger--active]="
+            openDropdown() === 'status'
+          "
+          (click)="toggleDropdown('status', $event)"
+        >
+
+          <span class="custom-select__content">
+
+            <span class="custom-select__label">
+              Status
+            </span>
+
+            <span class="custom-select__value">
+              {{ statusLabel() }}
+            </span>
+
+          </span>
+
+          <span class="custom-select__chevron">
+            {{ openDropdown() === 'status' ? '⌃' : '⌄' }}
+          </span>
+
+        </button>
+
+        @if (openDropdown() === 'status') {
+
+          <div class="custom-select__menu">
+
+            <button
+              type="button"
+              class="custom-option"
+              [class.custom-option--selected]="!status()"
+              (click)="selectStatus('')"
+            >
+              <span>All statuses</span>
+
+              @if (!status()) {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+            <button
+              type="button"
+              class="custom-option"
+              [class.custom-option--selected]="status() === 'OPEN'"
+              (click)="selectStatus('OPEN')"
+            >
+              <span>Open</span>
+
+              @if (status() === 'OPEN') {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+            <button
+              type="button"
+              class="custom-option"
+              [class.custom-option--selected]="status() === 'CLOSED'"
+              (click)="selectStatus('CLOSED')"
+            >
+              <span>Closed</span>
+
+              @if (status() === 'CLOSED') {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+            <button
+              type="button"
+              class="custom-option"
+              [class.custom-option--selected]="status() === 'CANCELLED'"
+              (click)="selectStatus('CANCELLED')"
+            >
+              <span>Cancelled</span>
+
+              @if (status() === 'CANCELLED') {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- SIDE -->
+
+      <div class="custom-select">
+
+        <button
+          type="button"
+          class="custom-select__trigger"
+          [class.custom-select__trigger--active]="
+            openDropdown() === 'side'
+          "
+          (click)="toggleDropdown('side', $event)"
+        >
+
+          <span class="custom-select__content">
+
+            <span class="custom-select__label">
+              Side
+            </span>
+
+            <span class="custom-select__value">
+              {{ sideLabel() }}
+            </span>
+
+          </span>
+
+          <span class="custom-select__chevron">
+            {{ openDropdown() === 'side' ? '⌃' : '⌄' }}
+          </span>
+
+        </button>
+
+        @if (openDropdown() === 'side') {
+
+          <div class="custom-select__menu">
+
+            <button
+              type="button"
+              class="custom-option"
+              [class.custom-option--selected]="!side()"
+              (click)="selectSide('')"
+            >
+              <span>All sides</span>
+
+              @if (!side()) {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+            <button
+              type="button"
+              class="custom-option custom-option--buy"
+              [class.custom-option--selected]="side() === 'BUY'"
+              (click)="selectSide('BUY')"
+            >
+              <span>Buy</span>
+
+              @if (side() === 'BUY') {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+            <button
+              type="button"
+              class="custom-option custom-option--sell"
+              [class.custom-option--selected]="side() === 'SELL'"
+              (click)="selectSide('SELL')"
+            >
+              <span>Sell</span>
+
+              @if (side() === 'SELL') {
+                <span class="custom-option__check">✓</span>
+              }
+            </button>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- ADVANCED FILTER BUTTON -->
+
+      <button
+        type="button"
+        class="advanced-toggle"
+        [class.advanced-toggle--active]="showAdvancedFilters()"
+        (click)="toggleAdvancedFilters()"
+      >
+
+        <span class="advanced-toggle__icon">
+          ⚙
+        </span>
+
+        <span>
+          Filters
+        </span>
+
+        @if (
+          from() ||
+          to() ||
+          sortBy() !== 'openTime' ||
+          sortOrder() !== 'desc'
+        ) {
+          <span class="advanced-toggle__dot"></span>
+        }
+
+        <span class="advanced-toggle__chevron">
+          {{ showAdvancedFilters() ? '⌃' : '⌄' }}
+        </span>
+
+      </button>
+
+    </div>
+
+
+    <!-- ===================================================
+         ADVANCED FILTERS
+         =================================================== -->
+
+    @if (showAdvancedFilters()) {
+
+      <div class="advanced-filters">
+
+        <!-- FROM -->
+
+        <div class="advanced-field">
+
+          <span class="advanced-field__label">
+            From
+          </span>
+
+          <input
+            type="date"
+            [value]="from()"
+            (change)="onFromChange($event)"
+          />
+
+        </div>
+
+
+        <!-- TO -->
+
+        <div class="advanced-field">
+
+          <span class="advanced-field__label">
+            To
+          </span>
+
+          <input
+            type="date"
+            [value]="to()"
+            (change)="onToChange($event)"
+          />
+
+        </div>
+
+
+        <!-- SORT BY -->
+
+        <div class="custom-select custom-select--advanced">
+
+          <button
+            type="button"
+            class="custom-select__trigger"
+            [class.custom-select__trigger--active]="
+              openDropdown() === 'sortBy'
+            "
+            (click)="toggleDropdown('sortBy', $event)"
+          >
+
+            <span class="custom-select__content">
+
+              <span class="custom-select__label">
+                Sort by
+              </span>
+
+              <span class="custom-select__value">
+                {{ sortByLabel() }}
+              </span>
+
+            </span>
+
+            <span class="custom-select__chevron">
+              {{ openDropdown() === 'sortBy' ? '⌃' : '⌄' }}
+            </span>
+
+          </button>
+
+          @if (openDropdown() === 'sortBy') {
+
+            <div class="custom-select__menu">
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortBy() === 'openTime'"
+                (click)="selectSortBy('openTime')"
+              >
+                Open time
+                @if (sortBy() === 'openTime') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortBy() === 'closeTime'"
+                (click)="selectSortBy('closeTime')"
+              >
+                Close time
+                @if (sortBy() === 'closeTime') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortBy() === 'symbol'"
+                (click)="selectSortBy('symbol')"
+              >
+                Symbol
+                @if (sortBy() === 'symbol') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortBy() === 'entryPrice'"
+                (click)="selectSortBy('entryPrice')"
+              >
+                Entry price
+                @if (sortBy() === 'entryPrice') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortBy() === 'exitPrice'"
+                (click)="selectSortBy('exitPrice')"
+              >
+                Exit price
+                @if (sortBy() === 'exitPrice') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortBy() === 'profit'"
+                (click)="selectSortBy('profit')"
+              >
+                Profit
+                @if (sortBy() === 'profit') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <!-- ORDER -->
+
+        <div class="custom-select custom-select--advanced">
+
+          <button
+            type="button"
+            class="custom-select__trigger"
+            [class.custom-select__trigger--active]="
+              openDropdown() === 'sortOrder'
+            "
+            (click)="toggleDropdown('sortOrder', $event)"
+          >
+
+            <span class="custom-select__content">
+
+              <span class="custom-select__label">
+                Order
+              </span>
+
+              <span class="custom-select__value">
+                {{ sortOrderLabel() }}
+              </span>
+
+            </span>
+
+            <span class="custom-select__chevron">
+              {{ openDropdown() === 'sortOrder' ? '⌃' : '⌄' }}
+            </span>
+
+          </button>
+
+          @if (openDropdown() === 'sortOrder') {
+
+            <div class="custom-select__menu">
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortOrder() === 'desc'"
+                (click)="selectSortOrder('desc')"
+              >
+                Descending
+                @if (sortOrder() === 'desc') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+              <button
+                type="button"
+                class="custom-option"
+                [class.custom-option--selected]="sortOrder() === 'asc'"
+                (click)="selectSortOrder('asc')"
+              >
+                Ascending
+                @if (sortOrder() === 'asc') {
+                  <span class="custom-option__check">✓</span>
+                }
+              </button>
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="advanced-actions">
+
+          <button
+            type="button"
+            class="button button--secondary"
+            (click)="clearFilters()"
+            [disabled]="isLoading()"
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            class="button button--primary"
+            (click)="applyFilters()"
+            [disabled]="isLoading()"
+          >
+            <span class="button__icon">
+              ↻
+            </span>
+            Apply
+          </button>
+
+        </div>
+
+      </div>
+
+    }
+
+
+    <!-- RESULT INFO -->
+
+    <div class="filter-toolbar__footer">
+
+      <span>
+        {{ totalFilteredTrades() }} trades found
+      </span>
+
+      <span class="filter-toolbar__hint">
+        Press Enter to search
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       ERROR
+       ===================================================== -->
+
   @if (errorMessage()) {
+
     <div class="error-banner">
-      <span class="error-banner__icon">!</span>
+
+      <div class="error-banner__icon">
+        !
+      </div>
 
       <div>
-        <strong>Something went wrong</strong>
-        <p>{{ errorMessage() }}</p>
+
+        <strong>
+          Something went wrong
+        </strong>
+
+        <p>
+          {{ errorMessage() }}
+        </p>
+
       </div>
+
     </div>
+
   }
 
 
-  <!-- LOADING -->
+  <!-- =====================================================
+       LOADING
+       ===================================================== -->
+
   @if (isLoading()) {
 
     <div class="state-card">
-      <div class="state-card__icon">◌</div>
-      <h3>{{ i18n.t('trade.list.loading') }}</h3>
+
+      <div class="state-card__icon">
+        ◌
+      </div>
+
+      <h3>
+        Loading trades...
+      </h3>
+
     </div>
 
-  } @else if (filteredTrades().length === 0) {
+  }
 
-    <!-- EMPTY -->
+
+  <!-- =====================================================
+       EMPTY
+       ===================================================== -->
+
+  @if (
+    !isLoading() &&
+    totalFilteredTrades() === 0
+  ) {
+
     <div class="empty-card">
-
-      <div class="empty-card__icon">
-        +
-      </div>
 
       <div class="empty-card__content">
 
-        <span class="panel-kicker">
-          {{ i18n.t('trade.nav.trades') }}
-        </span>
+        <div class="empty-card__icon">
+          ◇
+        </div>
 
         <h3>
-          {{ i18n.t('trade.list.emptyTitle') }}
+          No trades found
         </h3>
 
         <p>
-          {{ i18n.t('trade.list.emptyDescription') }}
+          There are no trades matching the current query.
+          Try changing your filters or create a new trade.
         </p>
 
-        <a
-          routerLink="/app/trades/new"
-          class="button button--primary"
-        >
-          <span class="button__icon">+</span>
-          {{ i18n.t('trade.list.createTrade') }}
-        </a>
+        <div class="empty-card__actions">
+
+          <button
+            type="button"
+            class="button button--secondary"
+            (click)="clearFilters()"
+          >
+            Clear Filters
+          </button>
+
+          <a
+            routerLink="/app/trades/new"
+            class="button button--primary"
+          >
+            Create Trade
+          </a>
+
+        </div>
 
       </div>
 
     </div>
 
-  } @else {
+  }
+
+
+  <!-- =====================================================
+       TRADE LIST
+       ===================================================== -->
+
+  @if (
+    !isLoading() &&
+    totalFilteredTrades() > 0
+  ) {
 
     <div class="trade-list">
 
       <!-- SUMMARY -->
-      <div class="summary-panel">
+
+      <section class="summary-panel">
 
         <div class="summary-stats">
 
           <div class="summary-card summary-card--blue">
+
             <span class="summary-card__label">
-              Visible Trades
+              Total Trades
             </span>
 
             <strong>
               {{ totalFilteredTrades() }}
             </strong>
 
-            <span class="summary-card__decor">◆</span>
+            <span class="summary-card__decor">
+              ◈
+            </span>
+
           </div>
 
-
           <div class="summary-card summary-card--green">
+
             <span class="summary-card__label">
-              Open Trades
+              Open · Current Page
             </span>
 
             <strong>
               {{ analytics().openTrades }}
             </strong>
 
-            <span class="summary-card__decor">●</span>
+            <span class="summary-card__decor">
+              ↗
+            </span>
+
           </div>
 
-
           <div class="summary-card summary-card--yellow">
+
             <span class="summary-card__label">
-              Closed Trades
+              Closed · Current Page
             </span>
 
             <strong>
               {{ analytics().closedTrades }}
             </strong>
 
-            <span class="summary-card__decor">★</span>
+            <span class="summary-card__decor">
+              ✓
+            </span>
+
           </div>
 
         </div>
 
+
+        <!-- TABLE CONTROLS -->
 
         <div class="table-controls">
 
           <div class="showing-chip">
-            <span>Showing</span>
-            <strong>{{ startRow() }}</strong>
-            <span>–</span>
-            <strong>{{ endRow() }}</strong>
-            <span>of</span>
-            <strong>{{ totalFilteredTrades() }}</strong>
+
+            Showing
+
+            <strong>
+              {{ startRow() }}–{{ endRow() }}
+            </strong>
+
+            of
+
+            <strong>
+              {{ totalFilteredTrades() }}
+            </strong>
+
           </div>
 
 
-          <label class="rows-control">
-            <span>Rows</span>
+          <!-- CUSTOM ROWS DROPDOWN -->
 
-            <select
-              [value]="pageSize()"
-              (change)="onPageSizeChange($event)"
+          <div class="custom-select custom-select--rows">
+
+            <button
+              type="button"
+              class="custom-select__trigger"
+              [class.custom-select__trigger--active]="
+                openDropdown() === 'pageSize'
+              "
+              (click)="toggleDropdown('pageSize', $event)"
             >
-              <option [value]="5">5</option>
-              <option [value]="10">10</option>
-              <option [value]="20">20</option>
-              <option [value]="50">50</option>
-            </select>
-          </label>
+
+              <span class="custom-select__content">
+
+                <span class="custom-select__label">
+                  Rows
+                </span>
+
+                <span class="custom-select__value">
+                  {{ pageSize() }}
+                </span>
+
+              </span>
+
+              <span class="custom-select__chevron">
+                {{ openDropdown() === 'pageSize' ? '⌃' : '⌄' }}
+              </span>
+
+            </button>
+
+            @if (openDropdown() === 'pageSize') {
+
+              <div class="custom-select__menu custom-select__menu--up">
+
+                <button
+                  type="button"
+                  class="custom-option"
+                  [class.custom-option--selected]="pageSize() === 10"
+                  (click)="selectPageSize(10)"
+                >
+                  10
+                  @if (pageSize() === 10) {
+                    <span class="custom-option__check">✓</span>
+                  }
+                </button>
+
+                <button
+                  type="button"
+                  class="custom-option"
+                  [class.custom-option--selected]="pageSize() === 20"
+                  (click)="selectPageSize(20)"
+                >
+                  20
+                  @if (pageSize() === 20) {
+                    <span class="custom-option__check">✓</span>
+                  }
+                </button>
+
+                <button
+                  type="button"
+                  class="custom-option"
+                  [class.custom-option--selected]="pageSize() === 50"
+                  (click)="selectPageSize(50)"
+                >
+                  50
+                  @if (pageSize() === 50) {
+                    <span class="custom-option__check">✓</span>
+                  }
+                </button>
+
+                <button
+                  type="button"
+                  class="custom-option"
+                  [class.custom-option--selected]="pageSize() === 100"
+                  (click)="selectPageSize(100)"
+                >
+                  100
+                  @if (pageSize() === 100) {
+                    <span class="custom-option__check">✓</span>
+                  }
+                </button>
+
+              </div>
+
+            }
+
+          </div>
 
         </div>
 
-      </div>
+      </section>
 
 
       <!-- TRADE CARDS -->
-      @for (trade of paginatedTrades(); track trade.tradeId) {
+
+      @for (
+        trade of paginatedTrades();
+        track trade.tradeId
+      ) {
 
         <article class="trade-card">
 
-          <!-- TRADE HEADER -->
-          <div class="trade-card__header">
+          <header class="trade-card__header">
 
             <div class="trade-identity">
 
@@ -196,6 +1109,7 @@
               </div>
 
               <div>
+
                 <h3>
                   {{ trade.symbol }}
                 </h3>
@@ -203,6 +1117,7 @@
                 <span class="market-type">
                   {{ formatMarketTypeLabel(trade.marketType) }}
                 </span>
+
               </div>
 
             </div>
@@ -213,30 +1128,30 @@
               <span
                 class="badge"
                 [class.badge--green]="trade.side === 'BUY'"
-                [class.badge--red]="trade.side !== 'BUY'"
+                [class.badge--red]="trade.side === 'SELL'"
               >
                 {{ formatSideLabel(trade.side) }}
               </span>
 
               <span
                 class="badge"
-                [class.badge--yellow]="trade.status === 'OPEN'"
-                [class.badge--blue]="trade.status !== 'OPEN'"
+                [class.badge--green]="trade.status === 'OPEN'"
+                [class.badge--blue]="trade.status === 'CLOSED'"
+                [class.badge--red]="trade.status === 'CANCELLED'"
               >
                 {{ formatStatusLabel(trade.status) }}
               </span>
 
             </div>
 
-          </div>
+          </header>
 
 
-          <!-- MAIN DATA -->
           <div class="trade-data-grid">
 
             <div class="data-box">
               <span class="data-label">
-                {{ i18n.t('trade.list.fields.entryQuantity') }}
+                Entry
               </span>
 
               <strong>
@@ -244,87 +1159,147 @@
               </strong>
 
               <small>
-                {{ i18n.t('trade.list.fields.qty') }}
-                {{ formatNumber(trade.quantity) }}
+                Qty {{ formatNumber(trade.quantity) }}
+              </small>
+            </div>
+
+
+            <div class="data-box">
+              <span class="data-label">
+                Exit
+              </span>
+
+              <strong>
+                {{ formatNumber(trade.exitPrice) }}
+              </strong>
+
+              <small>
+                {{
+                  trade.closeTime
+                    ? (trade.closeTime | date:'dd MMM yyyy, HH:mm')
+                    : 'Still open'
+                }}
               </small>
             </div>
 
 
             <div class="data-box data-box--risk">
               <span class="data-label">
-                {{ i18n.t('trade.list.fields.riskLevels') }}
+                Stop Loss
               </span>
 
               <strong>
-                SL {{ formatNumber(trade.stopLoss) }}
+                {{ formatNumber(trade.stopLoss) }}
               </strong>
 
               <small>
-                TP {{ formatNumber(trade.takeProfit) }}
+                Risk level
               </small>
             </div>
 
 
             <div class="data-box">
               <span class="data-label">
-                {{ i18n.t('trade.list.fields.exit') }}
+                Take Profit
               </span>
 
               <strong>
-                {{
-                  trade.exitPrice
-                    ? formatNumber(trade.exitPrice)
-                    : i18n.t('trade.list.fields.stillOpen')
-                }}
+                {{ formatNumber(trade.takeProfit) }}
               </strong>
 
               <small>
-                {{ i18n.t('trade.list.fields.lastUpdated') }}
+                Target level
               </small>
             </div>
 
 
             <div class="data-box">
               <span class="data-label">
-                {{ i18n.t('trade.list.fields.openTime') }}
+                Open Time
               </span>
 
               <strong class="date-value">
-                {{ trade.openTime | date: 'medium' }}
+                {{ trade.openTime | date:'dd MMM yyyy, HH:mm' }}
+              </strong>
+            </div>
+
+
+            <div class="data-box">
+              <span class="data-label">
+                Close Time
+              </span>
+
+              <strong class="date-value">
+                {{
+                  trade.closeTime
+                    ? (trade.closeTime | date:'dd MMM yyyy, HH:mm')
+                    : '—'
+                }}
+              </strong>
+            </div>
+
+
+            <div class="data-box">
+              <span class="data-label">
+                Trade ID
+              </span>
+
+              <strong>
+                {{ trade.tradeId }}
+              </strong>
+            </div>
+
+
+            <div class="data-box">
+              <span class="data-label">
+                Created
+              </span>
+
+              <strong class="date-value">
+                {{ trade.createdAt | date:'dd MMM yyyy, HH:mm' }}
               </strong>
             </div>
 
           </div>
 
 
-          <!-- JOURNAL -->
-          @if (trade.thesis || trade.note) {
+          @if (
+            trade.thesis ||
+            trade.note
+          ) {
 
             <div class="journal-grid">
 
               @if (trade.thesis) {
+
                 <div class="journal-box journal-box--yellow">
+
                   <span class="data-label">
-                    {{ i18n.t('trade.list.fields.thesis') }}
+                    Thesis
                   </span>
 
                   <p>
                     {{ trade.thesis }}
                   </p>
+
                 </div>
+
               }
 
-
               @if (trade.note) {
+
                 <div class="journal-box journal-box--blue">
+
                   <span class="data-label">
-                    {{ i18n.t('trade.list.fields.note') }}
+                    Note
                   </span>
 
                   <p>
                     {{ trade.note }}
                   </p>
+
                 </div>
+
               }
 
             </div>
@@ -332,20 +1307,24 @@
           }
 
 
-          <!-- ACTIONS -->
-          <div class="trade-card__footer">
+          <footer class="trade-card__footer">
 
             <span class="trade-updated">
-              Updated {{ trade.updatedAt | date: 'medium' }}
+              Updated
+              {{ trade.updatedAt | date:'dd MMM yyyy, HH:mm' }}
             </span>
 
             <div class="trade-actions">
 
               <a
-                [routerLink]="['/app/trades', trade.tradeId, 'edit']"
+                [routerLink]="[
+                  '/app/trades',
+                  trade.tradeId,
+                  'edit'
+                ]"
                 class="button button--secondary"
               >
-                {{ i18n.t('common.actions.edit') }}
+                Edit
               </a>
 
               <button
@@ -356,14 +1335,14 @@
               >
                 {{
                   deletingTradeId() === trade.tradeId
-                    ? i18n.t('trade.list.deleteSubmitting')
-                    : i18n.t('common.actions.delete')
+                    ? 'Deleting...'
+                    : 'Delete'
                 }}
               </button>
 
             </div>
 
-          </div>
+          </footer>
 
         </article>
 
@@ -371,13 +1350,23 @@
 
 
       <!-- PAGINATION -->
-      <div class="pagination-panel">
+
+      <section class="pagination-panel">
 
         <div class="pagination-info">
+
           Page
-          <strong>{{ currentPage() }}</strong>
-          /
-          <strong>{{ totalPages() }}</strong>
+
+          <strong>
+            {{ currentPage() }}
+          </strong>
+
+          of
+
+          <strong>
+            {{ totalPages() }}
+          </strong>
+
         </div>
 
         <div class="pagination-actions">
@@ -385,7 +1374,7 @@
           <button
             type="button"
             class="button button--secondary"
-            [disabled]="currentPage() === 1"
+            [disabled]="currentPage() <= 1 || isLoading()"
             (click)="goToPreviousPage()"
           >
             ← Previous
@@ -393,8 +1382,8 @@
 
           <button
             type="button"
-            class="button button--primary"
-            [disabled]="currentPage() === totalPages()"
+            class="button button--secondary"
+            [disabled]="currentPage() >= totalPages() || isLoading()"
             (click)="goToNextPage()"
           >
             Next →
@@ -402,7 +1391,7 @@
 
         </div>
 
-      </div>
+      </section>
 
     </div>
 

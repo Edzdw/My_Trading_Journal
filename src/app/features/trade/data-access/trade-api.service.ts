@@ -4,88 +4,162 @@ import { Observable } from 'rxjs';
 
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../auth/data-access/auth.service';
+
 import {
   CreateTradeRequest,
   Trade,
   TradeImportConfirmResponse,
   TradeImportPreviewResponse,
-  UpdateTradeRequest
+  TradeListResponse,
+  TradeListQuery,
+  UpdateTradeRequest,
 } from '../types/trade.models';
 
+export interface TradeOptionsResponse {
+  symbols: string[];
+  sources: string[];
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TradeApiService {
   private readonly api = inject(ApiService);
   private readonly authService = inject(AuthService);
+
   private readonly tradesPath = '/trades';
 
-  list(): Observable<Trade[]> {
-    return this.api.get<Trade[]>(this.tradesPath, {
-      headers: this.buildAuthHeaders()
-    });
+  list(
+    query?: TradeListQuery,
+  ): Observable<TradeListResponse> {
+    return this.api.get<TradeListResponse>(
+      this.tradesPath,
+      {
+        params: query
+          ? { ...query }
+          : undefined,
+
+        headers: this.buildAuthHeaders(),
+      },
+    );
   }
 
-  create(payload: CreateTradeRequest): Observable<Trade> {
-    return this.api.post<Trade, CreateTradeRequest>(this.tradesPath, payload, {
-      headers: this.buildAuthHeaders()
-    });
+  getOptions(): Observable<TradeOptionsResponse> {
+    return this.api.get<TradeOptionsResponse>(
+      `${this.tradesPath}/options`,
+      {
+        headers: this.buildAuthHeaders(),
+      },
+    );
   }
 
-  previewImport(file: File): Observable<TradeImportPreviewResponse> {
-    return this.api.post<TradeImportPreviewResponse, FormData>(
+  create(
+    payload: CreateTradeRequest,
+  ): Observable<Trade> {
+    return this.api.post<
+      Trade,
+      CreateTradeRequest
+    >(
+      this.tradesPath,
+      payload,
+      {
+        headers: this.buildAuthHeaders(),
+      },
+    );
+  }
+
+  previewImport(
+    file: File,
+  ): Observable<TradeImportPreviewResponse> {
+    return this.api.post<
+      TradeImportPreviewResponse,
+      FormData
+    >(
       `${this.tradesPath}/import/preview`,
       this.buildImportFormData(file),
       {
-        headers: this.buildAuthHeaders()
-      }
+        headers: this.buildAuthHeaders(),
+      },
     );
   }
 
-  confirmImport(file: File): Observable<TradeImportConfirmResponse> {
-    return this.api.post<TradeImportConfirmResponse, FormData>(
+  confirmImport(
+    file: File,
+  ): Observable<TradeImportConfirmResponse> {
+    return this.api.post<
+      TradeImportConfirmResponse,
+      FormData
+    >(
       `${this.tradesPath}/import/confirm`,
       this.buildImportFormData(file),
       {
-        headers: this.buildAuthHeaders()
-      }
+        headers: this.buildAuthHeaders(),
+      },
     );
   }
 
-  getById(tradeId: string): Observable<Trade> {
-    return this.api.get<Trade>(`${this.tradesPath}/${tradeId}`, {
-      headers: this.buildAuthHeaders()
-    });
+  getById(
+    tradeId: string,
+  ): Observable<Trade> {
+    return this.api.get<Trade>(
+      `${this.tradesPath}/${tradeId}`,
+      {
+        headers: this.buildAuthHeaders(),
+      },
+    );
   }
 
-  update(tradeId: string, payload: UpdateTradeRequest): Observable<Trade> {
-    return this.api.patch<Trade, UpdateTradeRequest>(`${this.tradesPath}/${tradeId}`, payload, {
-      headers: this.buildAuthHeaders()
-    });
+  update(
+    tradeId: string,
+    payload: UpdateTradeRequest,
+  ): Observable<Trade> {
+    return this.api.patch<
+      Trade,
+      UpdateTradeRequest
+    >(
+      `${this.tradesPath}/${tradeId}`,
+      payload,
+      {
+        headers: this.buildAuthHeaders(),
+      },
+    );
   }
 
-  delete(tradeId: string): Observable<void> {
-    return this.api.delete<void>(`${this.tradesPath}/${tradeId}`, {
-      headers: this.buildAuthHeaders()
-    });
+
+  delete(
+    tradeId: string,
+  ): Observable<void> {
+    return this.api.delete<void>(
+      `${this.tradesPath}/${tradeId}`,
+      {
+        headers: this.buildAuthHeaders(),
+      },
+    );
   }
 
-  private buildImportFormData(file: File): FormData {
+  private buildImportFormData(
+    file: File,
+  ): FormData {
     const formData = new FormData();
+
     formData.append('file', file);
+
     return formData;
   }
 
   private buildAuthHeaders(): HttpHeaders {
     this.authService.restoreSession();
-    const accessToken = this.authService.getAccessToken();
+
+    const accessToken =
+      this.authService.getAccessToken();
 
     return new HttpHeaders(
       accessToken
         ? {
-            Authorization: `Bearer ${accessToken}`
+            Authorization:
+              `Bearer ${accessToken}`,
           }
-        : {}
+        : {},
     );
   }
 }

@@ -1,6 +1,31 @@
 export type TradeMarketType = 'CRYPTO' | 'FOREX' | 'STOCK' | 'FUTURES';
 export type TradeSide = 'BUY' | 'SELL';
 export type TradeStatus = 'OPEN' | 'CLOSED' | 'CANCELLED';
+export type TradeExitReason = 'TP' | 'SL' | 'MANUAL';
+
+export interface TradeListResponse {
+  data: Trade[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface TradeListQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: TradeStatus;
+  side?: TradeSide;
+  from?: string;
+  to?: string;
+  symbol?: string;
+  source?: string;
+}
 
 export interface Trade {
   tradeId: string;
@@ -11,8 +36,8 @@ export interface Trade {
   side: TradeSide;
   entryPrice: string;
   exitPrice: string | null;
-  stopLoss: string;
-  takeProfit: string;
+  stopLoss: string | null;
+  takeProfit: string | null;
   quantity: string;
   openTime: string;
   closeTime: string | null;
@@ -22,6 +47,7 @@ export interface Trade {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  exitReason: TradeExitReason | null;
 }
 
 export interface CreateTradeRequest {
@@ -29,15 +55,19 @@ export interface CreateTradeRequest {
   marketType: TradeMarketType;
   side: TradeSide;
   entryPrice: string;
-  stopLoss: string;
-  takeProfit: string;
+  stopLoss: string | null;
+  takeProfit: string | null;
   quantity: string;
   openTime: string;
   thesis: string | null;
   note: string | null;
 }
 
-export type UpdateTradeRequest = Partial<CreateTradeRequest>;
+export type UpdateTradeRequest = Partial<CreateTradeRequest> & {
+  status?: TradeStatus;
+  exitPrice?: string;
+  exitReason?: TradeExitReason;
+};
 
 export interface TradeImportPreviewSummary {
   sourceType: 'MT5_HTML';

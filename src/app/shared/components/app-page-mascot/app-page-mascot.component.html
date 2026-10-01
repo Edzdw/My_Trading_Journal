@@ -1,0 +1,23 @@
+<div class="mascot-orbit">
+  <span class="mascot-spark mascot-spark--one">✦</span>
+  <span class="mascot-spark mascot-spark--two">·</span>
+  <span class="mascot-spark mascot-spark--three">·</span>
+
+  <button
+    type="button"
+    class="mascot"
+    [class.mascot--reacting]="isReacting()"
+    aria-label="Page mascot"
+    (click)="onMascotClick()"
+  >
+    <span
+      class="mascot-sprite"
+      [class.mascot-sprite--reaction]="isReacting()"
+      [style.background-position]="
+        isReacting()
+          ? getReactionPosition()
+          : getDirectionPosition()
+      "
+    ></span>
+  </button>
+</div>
