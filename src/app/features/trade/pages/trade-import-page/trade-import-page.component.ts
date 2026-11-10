@@ -1,17 +1,15 @@
-import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
-import { Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 
 import { I18nService } from '../../../../core/services/i18n.service';
-import { TradeService } from '../../data-access/trade.service';
+import { TradeImportTaskService } from '../../data-access/trade-import-task.service';
 import {
-  TradeImportConfirmResponse,
-  TradeImportPreviewResponse,
   TradeImportPreviewTradeRow
 } from '../../types/trade.models';
 
 @Component({
   selector: 'app-trade-import-page',
+  imports: [DatePipe],
   providers: [DecimalPipe, DatePipe],
   templateUrl: './trade-import-page.component.html',
   styleUrl: './trade-import-page.component.css'
@@ -19,20 +17,19 @@ import {
 export class TradeImportPageComponent {
   protected readonly i18n = inject(I18nService);
 
-  private readonly tradeService = inject(TradeService);
-  private readonly destroyRef = inject(DestroyRef);
+  protected readonly task = inject(TradeImportTaskService);
   private readonly decimalPipe = inject(DecimalPipe);
   private readonly datePipe = inject(DatePipe);
   private readonly fileInputRef = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 
-  protected readonly selectedFile = signal<File | null>(null);
-  protected readonly selectedFileName = signal<string | null>(null);
-  protected readonly previewResponse = signal<TradeImportPreviewResponse | null>(null);
-  protected readonly confirmResponse = signal<TradeImportConfirmResponse | null>(null);
-  protected readonly isPreviewing = signal(false);
-  protected readonly isConfirming = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
-  protected readonly successMessage = signal<string | null>(null);
+  protected readonly selectedFile = this.task.selectedFile;
+  protected readonly selectedFileName = this.task.selectedFileName;
+  protected readonly previewResponse = this.task.previewResponse;
+  protected readonly confirmResponse = this.task.confirmResponse;
+  protected readonly isPreviewing = this.task.isPreviewing;
+  protected readonly isConfirming = this.task.isConfirming;
+  protected readonly errorMessage = this.task.errorMessage;
+  protected readonly successMessage = this.task.successMessage;
 
   protected readonly pageSize = signal(10);
   protected readonly currentPage = signal(1);
@@ -80,88 +77,19 @@ export class TradeImportPageComponent {
   ];
 
   protected onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-
-    this.selectedFile.set(file);
-    this.selectedFileName.set(file?.name ?? null);
-    this.previewResponse.set(null);
-    this.confirmResponse.set(null);
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
+    this.task.selectFile((event.target as HTMLInputElement).files?.[0] ?? null);
     this.currentPage.set(1);
   }
 
-  protected previewImport(): void {
-    const file = this.selectedFile();
-    if (!file) {
-      this.errorMessage.set(this.i18n.t('trade.import.previewRequired'));
-      return;
-    }
-
-    this.isPreviewing.set(true);
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
-    this.confirmResponse.set(null);
-
-    this.tradeService
-      .previewTradeImport(file)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          this.previewResponse.set(response);
-          this.currentPage.set(1);
-          this.successMessage.set(this.i18n.t('trade.import.previewSuccess'));
-          this.isPreviewing.set(false);
-        },
-        error: (error) => {
-          this.errorMessage.set(this.extractErrorMessage(error));
-          this.isPreviewing.set(false);
-        }
-      });
-  }
-
-  protected confirmImport(): void {
-    const file = this.selectedFile();
-    if (!file || !this.previewResponse()) {
-      this.errorMessage.set(this.i18n.t('trade.import.previewRequired'));
-      return;
-    }
-
-    this.isConfirming.set(true);
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
-
-    this.tradeService
-      .confirmTradeImport(file)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          this.confirmResponse.set(response);
-          this.successMessage.set(this.i18n.t('trade.import.confirmSuccess'));
-          this.isConfirming.set(false);
-        },
-        error: (error) => {
-          this.errorMessage.set(this.extractErrorMessage(error));
-          this.isConfirming.set(false);
-        }
-      });
-  }
-
+  protected previewImport(): void { this.task.preview(); }
+  protected confirmImport(): void { this.task.confirm(); }
   protected resetState(): void {
-    this.selectedFile.set(null);
-    this.selectedFileName.set(null);
-    this.previewResponse.set(null);
-    this.confirmResponse.set(null);
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
+    if (this.task.busy()) return;
+    this.task.reset();
     this.currentPage.set(1);
     this.fileInputRef().nativeElement.value = '';
   }
-
-  protected canConfirmImport(): boolean {
-    return !!this.selectedFile() && !!this.previewResponse() && !this.isPreviewing() && !this.isConfirming();
-  }
+  protected canConfirmImport(): boolean { return this.task.canConfirm(); }
 
   protected goToPreviousPage(): void {
     const current = this.currentPage();
@@ -256,29 +184,4 @@ export class TradeImportPageComponent {
       : 'text-rose-700 dark:text-rose-300';
   }
 
-  private extractErrorMessage(error: unknown): string {
-    const fallback = this.i18n.t('trade.import.requestError');
-    if (!error || typeof error !== 'object') {
-      return fallback;
-    }
-
-    const response = (error as { error?: unknown }).error;
-    if (typeof response === 'string') {
-      return response;
-    }
-
-    if (response && typeof response === 'object') {
-      const message = (response as { message?: unknown }).message;
-      if (typeof message === 'string') {
-        return message;
-      }
-
-      if (Array.isArray(message)) {
-        return message.join(', ');
-      }
-    }
-
-    const directMessage = (error as { message?: unknown }).message;
-    return typeof directMessage === 'string' ? directMessage : fallback;
-  }
 }

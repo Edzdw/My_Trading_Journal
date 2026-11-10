@@ -1,0 +1,69 @@
+@if (task.visible()) {
+  <section
+    class="import-task"
+    [class.import-task--warning]="
+      task.state() === 'unknown' || task.state() === 'interrupted' || task.state() === 'error'
+    "
+    aria-label="MT5 import"
+    [attr.aria-busy]="task.busy()"
+  >
+    <span class="task-icon" [class.task-icon--busy]="task.busy()" aria-hidden="true">{{
+      task.busy() ? '↻' : task.state() === 'complete' ? '✓' : '↑'
+    }}</span>
+    <div class="task-copy">
+      <div class="task-heading" role="status" aria-live="polite">
+        <strong>{{ i18n.t(task.statusKey()) }}</strong>
+        <span class="task-count">{{ i18n.t('importTask.oneFile') }}</span>
+      </div>
+      <p class="task-filename" [title]="task.selectedFileName() ?? ''">
+        {{ task.selectedFileName() }}
+      </p>
+      @if (task.busy()) {
+        <p>{{ i18n.t('importTask.keepBrowsing') }}</p>
+      } @else if (task.recoveryMessage()) {
+        <p>{{ task.recoveryMessage() }}</p>
+      } @else if (task.errorMessage()) {
+        <p>{{ task.errorMessage() }}</p>
+      } @else if (task.confirmResponse(); as result) {
+        <p>
+          {{
+            i18n.t('importTask.result', {
+              imported: result.summary.importedRows,
+              skipped: result.summary.skippedRows,
+            })
+          }}
+        </p>
+      }
+      @if (task.busy()) {
+        <div
+          class="task-progress"
+          role="progressbar"
+          [attr.aria-label]="i18n.t(task.statusKey())"
+          [attr.aria-valuenow]="task.state() === 'uploading' ? task.progress() : null"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [class.task-progress--indeterminate]="
+            task.state() !== 'uploading' || task.progress() === null
+          "
+        >
+          <span
+            [style.width.%]="
+              task.state() === 'uploading' && task.progress() !== null ? task.progress() : 35
+            "
+          ></span>
+        </div>
+      }
+    </div>
+    <div class="task-actions">
+      @if (task.state() === 'uploading' && task.progress() !== null) {
+        <strong>{{ task.progress() }}%</strong>
+      }
+      @if (task.state() === 'unknown') {
+        <a routerLink="/app/trades/list">{{ i18n.t('importTask.history') }}</a>
+      }
+      <a routerLink="/app/trades/import"
+        >{{ i18n.t('importTask.view') }} <span aria-hidden="true">→</span></a
+      >
+    </div>
+  </section>
+}

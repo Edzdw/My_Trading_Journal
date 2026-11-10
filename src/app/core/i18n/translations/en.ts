@@ -1,6 +1,28 @@
 import { TranslationDictionary } from '../i18n.models';
 
 export const enTranslations: TranslationDictionary = {
+  importTask: {
+    "uploading": "Uploading MT5 report",
+    "analysing": "Analysing report",
+    "importing": "Importing trades",
+    "ready": "Preview ready for review",
+    "complete": "Trade import complete",
+    "error": "Request could not be completed",
+    "interrupted": "Preview interrupted",
+    "unknown": "Import result unconfirmed",
+    "idle": "No active task",
+    "oneFile": "1 file",
+    "keepBrowsing": "You can browse other pages in the app. Keep this browser tab open to follow the result.",
+    "unknownHelp": "No confirmation was received. The import may have completed or may still be running, including in another tab. Check trade history before importing again.",
+    "interruptedHelp": "The preview could not be restored. Select the file again to preview it; the report is never resent automatically.",
+    "resetHelp": "Only start again after checking history. Resetting does not cancel a request already sent to the server.",
+    "reset": "Reset / Choose a new file",
+    "view": "View import",
+    "history": "Trade history",
+    "result": "Imported {imported} trades · Skipped {skipped} trades",
+    "noRows": "The report has no valid trades to import.",
+    "sessionRequired": "Your account is still loading. Please try again shortly."
+},
   common: {
     appName: 'Trade Journal',
     language: 'Language',

@@ -26,6 +26,20 @@
   </div>
 
 
+  @if (task.recoveryMessage()) {
+    <div class="error-banner" role="alert">
+      <span class="error-banner__icon">!</span>
+      <div>
+        <strong>{{ i18n.t(task.statusKey()) }}</strong>
+        <p>{{ task.recoveryMessage() }}</p>
+        <p>{{ selectedFileName() }} · {{ task.startedAt() | date:'medium' }}</p>
+        @if (task.state() === 'unknown') {
+          <p>{{ i18n.t('importTask.resetHelp') }}</p>
+        }
+      </div>
+    </div>
+  }
+
   <!-- STEP 1 -->
   <section class="import-panel import-panel--upload">
 
@@ -54,7 +68,8 @@
 
     <div
       class="upload-zone"
-      (click)="fileInput.click()"
+      (click)="!task.busy() && task.state() !== 'unknown' && fileInput.click()"
+      [class.upload-zone--disabled]="task.busy() || task.state() === 'unknown'"
     >
 
       <div class="upload-zone__icon">
@@ -66,11 +81,11 @@
       </strong>
 
       <span>
-        or drag your file here
+        {{ i18n.t('importTask.oneFile') }}
       </span>
 
       <small>
-        CSV / HTML supported
+        HTML / HTM · MT5
       </small>
 
       <div class="selected-file">
@@ -87,6 +102,8 @@
       #fileInput
       type="file"
       class="hidden-input"
+      accept=".html,.htm,text/html"
+      [disabled]="task.busy() || task.state() === 'unknown'"
       (change)="onFileSelected($event)"
     />
 
@@ -96,7 +113,7 @@
       <button
         type="button"
         class="button button--primary"
-        [disabled]="!selectedFile() || isPreviewing()"
+        [disabled]="!selectedFile() || task.busy() || task.state() === 'unknown' || task.state() === 'complete'"
         (click)="previewImport()"
       >
         <span class="button__icon">
@@ -113,9 +130,10 @@
       <button
         type="button"
         class="button button--secondary"
+        [disabled]="task.busy()"
         (click)="resetState()"
       >
-        Reset
+        {{ i18n.t('importTask.reset') }}
       </button>
 
     </div>

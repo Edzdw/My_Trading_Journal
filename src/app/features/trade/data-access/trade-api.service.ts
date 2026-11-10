@@ -1,6 +1,7 @@
-import { HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../auth/data-access/auth.service';
@@ -25,6 +26,7 @@ export interface TradeOptionsResponse {
 })
 export class TradeApiService {
   private readonly api = inject(ApiService);
+  private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
 
   private readonly tradesPath = '/trades';
@@ -135,6 +137,13 @@ export class TradeApiService {
         headers: this.buildAuthHeaders(),
       },
     );
+  }
+
+  uploadImport<T>(stage: 'preview' | 'confirm', file: File): Observable<HttpEvent<T>> {
+    return this.http.post<T>(`${environment.apiBaseUrl}${this.tradesPath}/import/${stage}`,
+      this.buildImportFormData(file), {
+        headers: this.buildAuthHeaders(), observe: 'events', reportProgress: true,
+      });
   }
 
   private buildImportFormData(

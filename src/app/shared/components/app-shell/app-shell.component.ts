@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { AppImportStatusComponent } from '../app-import-status/app-import-status.component';
 import { AppHeaderComponent } from '../app-header/app-header.component';
 import { AppSidebarComponent } from '../app-sidebar/app-sidebar.component';
 
@@ -10,7 +11,7 @@ import { AppSidebarComponent } from '../app-sidebar/app-sidebar.component';
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, AppHeaderComponent, AppSidebarComponent],
+  imports: [RouterOutlet, AppHeaderComponent, AppSidebarComponent, AppImportStatusComponent],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.css',
 })

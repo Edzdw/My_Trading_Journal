@@ -8,6 +8,8 @@
   <div class="app-layout">
     <app-header (menuClick)="toggleSidebar()" />
 
+    <app-import-status />
+
     <div class="app-body">
       <aside class="app-sidebar-area" [class.open]="sidebarOpen()">
         <app-sidebar (close)="closeSidebar()" />

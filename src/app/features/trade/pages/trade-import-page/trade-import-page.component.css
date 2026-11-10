@@ -1065,3 +1065,5 @@
   }
 
 }
+.upload-zone--disabled { cursor: not-allowed; opacity: .6; }
+.upload-zone--disabled:hover { transform: none; }

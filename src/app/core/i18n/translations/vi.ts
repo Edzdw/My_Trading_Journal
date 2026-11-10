@@ -1,6 +1,28 @@
 import { TranslationDictionary } from '../i18n.models';
 
 export const viTranslations: TranslationDictionary = {
+  importTask: {
+    "uploading": "Đang gửi báo cáo MT5",
+    "analysing": "Đang phân tích báo cáo",
+    "importing": "Đang nhập giao dịch",
+    "ready": "Bản xem trước đã sẵn sàng",
+    "complete": "Nhập giao dịch hoàn tất",
+    "error": "Không thể hoàn tất yêu cầu",
+    "interrupted": "Lượt xem trước bị gián đoạn",
+    "unknown": "Chưa xác định kết quả nhập",
+    "idle": "Chưa có tác vụ",
+    "oneFile": "1 file",
+    "keepBrowsing": "Bạn có thể chuyển trang trong ứng dụng. Giữ tab trình duyệt này mở để theo dõi kết quả.",
+    "unknownHelp": "Chưa nhận được kết quả xác nhận. Lượt nhập có thể đã hoàn tất hoặc vẫn đang chạy, kể cả trong tab khác. Kiểm tra lịch sử giao dịch trước khi nhập lại.",
+    "interruptedHelp": "Không khôi phục được lượt xem trước. Hãy chọn lại file để xem trước; ứng dụng không tự gửi lại báo cáo.",
+    "resetHelp": "Chỉ bắt đầu lượt mới sau khi kiểm tra lịch sử. Đặt lại không hủy tác vụ đã gửi tới máy chủ.",
+    "reset": "Đặt lại / Chọn file mới",
+    "view": "Xem import",
+    "history": "Lịch sử giao dịch",
+    "result": "Đã nhập {imported} lệnh · Bỏ qua {skipped} lệnh",
+    "noRows": "Báo cáo không có giao dịch hợp lệ để nhập.",
+    "sessionRequired": "Đang tải thông tin tài khoản. Vui lòng thử lại sau giây lát."
+},
   common: {
     appName: 'Nhật ký giao dịch',
     language: 'Ngôn ngữ',
