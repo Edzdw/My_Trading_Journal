@@ -9,6 +9,8 @@ import { AuthService } from '../../auth/data-access/auth.service';
 import {
   CreateTradeRequest,
   Trade,
+  TradeJournalQuery,
+  TradeJournalResponse,
   TradeImportConfirmResponse,
   TradeImportPreviewResponse,
   TradeListResponse,
@@ -44,6 +46,12 @@ export class TradeApiService {
         headers: this.buildAuthHeaders(),
       },
     );
+  }
+
+  journal(query: TradeJournalQuery): Observable<TradeJournalResponse> {
+    return this.api.get<TradeJournalResponse>(`${this.tradesPath}/journal`, {
+      params: { ...query }, headers: this.buildAuthHeaders(),
+    });
   }
 
   getOptions(): Observable<TradeOptionsResponse> {

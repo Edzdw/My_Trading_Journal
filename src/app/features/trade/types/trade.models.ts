@@ -128,3 +128,21 @@ export interface TradeImportConfirmResponse {
   warnings: string[];
   errors: string[];
 }
+
+export interface JournalTrade extends Trade {
+  source: string;
+  externalPositionId: string | null;
+}
+
+export interface TradeJournalQuery {
+  from: string;
+  before: string;
+  page: number;
+  limit: number;
+  notes: 'all' | 'missing';
+}
+
+export interface TradeJournalResponse extends TradeListResponse {
+  data: JournalTrade[];
+  summary: { total: number; withoutNote: number };
+}

@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 
 import {
   Trade,
+  TradeJournalQuery,
+  TradeJournalResponse,
   TradeImportConfirmResponse,
   TradeImportPreviewResponse,
   TradeListResponse,
@@ -27,6 +29,10 @@ export class TradeService {
 
   listTrades(query?: TradeListQuery): Observable<TradeListResponse> {
     return this.tradeApi.list(query);
+  }
+
+  getTradeJournal(query: TradeJournalQuery): Observable<TradeJournalResponse> {
+    return this.tradeApi.journal(query);
   }
 
   getTradeOptions(): Observable<TradeOptionsResponse> {

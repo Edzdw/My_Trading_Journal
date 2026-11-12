@@ -1,418 +1,300 @@
-<section class="overview-page">
+<section class="journal-page">
+  <header class="journal-heading">
+    <div>
+      <h1>{{ i18n.t('journal.title') }}</h1>
+      <p>{{ i18n.t('journal.subtitle') }}</p>
+    </div>
+    <div class="date-navigation">
+      <button
+        type="button"
+        class="icon-button"
+        (click)="shiftDay(-1)"
+        [disabled]="isSaving()"
+        [attr.aria-label]="i18n.t('journal.previousDay')"
+      >
+        ‹
+      </button>
+      <label class="date-picker">
+        <span>{{ day() === today() ? i18n.t('journal.today') : i18n.t('journal.date') }}</span>
+        <input
+          #dateInput
+          type="date"
+          [value]="day()"
+          [max]="today()"
+          [disabled]="isSaving()"
+          (change)="changeDay(dateInput.value); dateInput.value = day()"
+          [attr.aria-label]="i18n.t('journal.date')"
+        />
+      </label>
+      <button
+        type="button"
+        class="icon-button"
+        (click)="shiftDay(1)"
+        [disabled]="isSaving() || day() >= today()"
+        [attr.aria-label]="i18n.t('journal.nextDay')"
+      >
+        ›
+      </button>
+    </div>
+  </header>
+  <div class="journal-summary" aria-live="polite">
+    <span>
+      @if (isLoading()) {
+        {{ i18n.t('journal.loading') }}
+      } @else if (!errorMessage()) {
+        {{ i18n.t('journal.summary', { total: summary().total, missing: summary().withoutNote }) }}
+      } @else {
+        {{ i18n.t('journal.unavailable') }}
+      }
+    </span>
+    <small>{{ timezone }}</small>
+  </div>
 
-  <!-- ERROR -->
   @if (errorMessage()) {
-    <div class="overview-alert overview-alert--error">
-      <span class="overview-alert-icon">!</span>
-
-      <div>
-        <strong>{{ i18n.t('trade.list.loadError') }}</strong>
-        <p>{{ errorMessage() }}</p>
-      </div>
+    <div class="message message--error" role="alert">
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="button" (click)="retry()">{{ i18n.t('journal.retry') }}</button>
     </div>
   }
 
-  <!-- LOADING -->
-  @if (isLoading()) {
-    <div class="overview-loading">
-      <div class="loading-star">★</div>
-
-      <div>
-        <strong>Loading trade data...</strong>
-        <span>{{ i18n.t('trade.list.loading') }}</span>
+  <div class="journal-workbench" [attr.aria-busy]="isLoading()">
+    <section class="trade-panel" [attr.aria-label]="i18n.t('journal.dayTrades')">
+      <h2>{{ i18n.t('journal.dayTrades') }}</h2>
+      <div class="note-filters" role="group" [attr.aria-label]="i18n.t('journal.noteFilter')">
+        <button
+          type="button"
+          [class.active]="notesFilter() === 'all'"
+          [attr.aria-pressed]="notesFilter() === 'all'"
+          [disabled]="isSaving()"
+          (click)="changeFilter('all')"
+        >
+          {{ i18n.t('journal.all') }}
+        </button>
+        <button
+          type="button"
+          [class.active]="notesFilter() === 'missing'"
+          [attr.aria-pressed]="notesFilter() === 'missing'"
+          [disabled]="isSaving()"
+          (click)="changeFilter('missing')"
+        >
+          {{ i18n.t('journal.withoutNote') }}
+        </button>
       </div>
-    </div>
-  } @else {
-
-    <!-- HEADER -->
-    <section class="overview-header">
-
-      <div class="overview-title">
-
-        <div class="title-kicker">
-          <span class="title-star">★</span>
-          TRADE OVERVIEW
+      <div class="trade-list">
+        @if (isLoading()) {
+          <p class="empty-copy" role="status">{{ i18n.t('journal.loading') }}</p>
+        } @else if (!errorMessage()) {
+          @for (trade of trades(); track trade.tradeId) {
+            <button
+              class="trade-row"
+              type="button"
+              [class.selected]="selected()?.tradeId === trade.tradeId"
+              [attr.aria-pressed]="selected()?.tradeId === trade.tradeId"
+              [disabled]="isSaving()"
+              (click)="selectTrade(trade)"
+            >
+              <span class="trade-row__identity"
+                ><strong>{{ trade.symbol }}</strong
+                ><span
+                  class="badge"
+                  [class.badge--buy]="trade.side === 'BUY'"
+                  [class.badge--sell]="trade.side === 'SELL'"
+                  >{{ trade.side }}</span
+                ></span
+              >
+              <span class="trade-row__bottom"
+                ><time>{{ i18n.t('journal.closedAt') }} {{ trade.closeTime | date: 'HH:mm' }}</time>
+                <span
+                  class="badge"
+                  [class.badge--noted]="hasNote(trade)"
+                  [class.badge--missing]="!hasNote(trade)"
+                  >{{ i18n.t(hasNote(trade) ? 'journal.hasNote' : 'journal.withoutNote') }}</span
+                >
+              </span>
+            </button>
+          } @empty {
+            <div class="empty-list">
+              <strong>{{
+                i18n.t(
+                  notesFilter() === 'missing' && summary().total > 0
+                    ? 'journal.noMissing'
+                    : 'journal.noTrades'
+                )
+              }}</strong>
+              <p>
+                {{
+                  i18n.t(
+                    notesFilter() === 'missing' && summary().total > 0
+                      ? 'journal.noMissingHelp'
+                      : 'journal.noTradesHelp'
+                  )
+                }}
+              </p>
+              @if (summary().total === 0) {
+                <a class="text-link" routerLink="/app/trades/import"
+                  >{{ i18n.t('journal.import') }} →</a
+                >
+              }
+            </div>
+          }
+        }
+      </div>
+      <footer class="list-pagination">
+        <span>{{
+          i18n.t('journal.pagination', {
+            page: meta().totalPages ? meta().page : 0,
+            pages: meta().totalPages,
+            total: meta().total,
+          })
+        }}</span>
+        <div>
+          <button
+            type="button"
+            class="icon-button"
+            [disabled]="isLoading() || isSaving() || meta().page <= 1"
+            (click)="changePage(meta().page - 1)"
+            [attr.aria-label]="i18n.t('journal.previousPage')"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            class="icon-button"
+            [disabled]="isLoading() || isSaving() || meta().page >= meta().totalPages"
+            (click)="changePage(meta().page + 1)"
+            [attr.aria-label]="i18n.t('journal.nextPage')"
+          >
+            ›
+          </button>
         </div>
+      </footer>
+    </section>
 
-        <h1>
-          {{ i18n.t('trade.dashboard.subtitle') }}
-        </h1>
-
-        <p>
-          {{ i18n.t('trade.dashboard.description') }}
-        </p>
-
-      </div>
-
-      <!-- RANGE -->
-      <div class="range-selector">
-
-        <span class="range-label">
-          PERIOD
-        </span>
-
-        <div class="range-buttons">
-          @for (range of ranges; track range) {
+    <section #editorPanel class="editor-panel" [attr.aria-label]="i18n.t('journal.tradeNote')">
+      @if (selected(); as trade) {
+        <header class="editor-heading">
+          <div>
+            <h2>{{ trade.symbol }}</h2>
+            <span
+              class="badge"
+              [class.badge--buy]="trade.side === 'BUY'"
+              [class.badge--sell]="trade.side === 'SELL'"
+              >{{ trade.side }}</span
+            ><span class="badge">{{ i18n.t('journal.closed') }}</span>
+          </div>
+          <small
+            >{{ trade.source === 'IMPORT_MT5' ? 'MT5' : i18n.t('journal.manual') }} · #{{
+              trade.externalPositionId ?? trade.tradeNo
+            }}</small
+          >
+        </header>
+        <dl class="execution-details">
+          <div>
+            <dt>{{ i18n.t('journal.entryExit') }}</dt>
+            <dd>
+              {{ formatNumber(trade.entryPrice) }} <span aria-hidden="true">→</span>
+              {{ formatNumber(trade.exitPrice) }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('journal.quantity') }}</dt>
+            <dd>{{ formatNumber(trade.quantity) }}</dd>
+          </div>
+          <div>
+            <dt>SL / TP</dt>
+            <dd>{{ formatNumber(trade.stopLoss) }} / {{ formatNumber(trade.takeProfit) }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('journal.holdingTime') }}</dt>
+            <dd>{{ duration(trade) }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('journal.openTime') }}</dt>
+            <dd>{{ trade.openTime | date: 'dd/MM/yyyy · HH:mm' }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('journal.closeTime') }}</dt>
+            <dd>{{ trade.closeTime | date: 'dd/MM/yyyy · HH:mm' }}</dd>
+          </div>
+        </dl>
+        <div class="editor-tabs">
+          <span class="editor-tab--active">{{ i18n.t('journal.tradeNote') }}</span>
+          <button type="button" disabled>
+            {{ i18n.t('journal.dailySummary') }} <small>{{ i18n.t('journal.comingSoon') }}</small>
+          </button>
+        </div>
+        <div class="journal-fields">
+          <label for="journal-thesis">{{ i18n.t('journal.thesis') }}</label>
+          <textarea
+            id="journal-thesis"
+            rows="2"
+            [value]="thesis()"
+            (input)="thesis.set($any($event.target).value); statusMessage.set(null)"
+            [disabled]="isSaving()"
+            [placeholder]="i18n.t('journal.thesisPlaceholder')"
+          ></textarea>
+          <label for="journal-note">{{ i18n.t('journal.note') }}</label>
+          <textarea
+            #noteInput
+            id="journal-note"
+            rows="6"
+            [value]="note()"
+            (input)="note.set($any($event.target).value); statusMessage.set(null)"
+            [disabled]="isSaving()"
+            [placeholder]="i18n.t('journal.notePlaceholder')"
+          ></textarea>
+          <div class="writing-prompts">
             <button
               type="button"
-              [class.active]="selectedRange() === range"
-              (click)="onRangeChange(range)"
+              [disabled]="isSaving()"
+              (click)="addPrompt('good'); noteInput.focus()"
             >
-              {{ i18n.t('trade.range.' + range) }}
+              ✓ {{ i18n.t('journal.good') }}
             </button>
-          }
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- STAT CARDS -->
-    <section class="stats-grid">
-
-      <!-- TOTAL -->
-      <article class="stat-card stat-card--green">
-
-        <div class="stat-card-top">
-          <span class="stat-icon">★</span>
-
-          <span class="stat-badge">
-            ALL
-          </span>
-        </div>
-
-        <div class="stat-label">
-          {{ i18n.t('trade.dashboard.cards.totalTrades') }}
-        </div>
-
-        <div class="stat-value">
-          {{ analytics().totalTrades }}
-        </div>
-
-        <div class="stat-footer">
-          <span class="status-dot"></span>
-          TOTAL TRADES
-        </div>
-
-      </article>
-
-
-      <!-- OPEN -->
-      <article class="stat-card stat-card--yellow">
-
-        <div class="stat-card-top">
-          <span class="stat-icon">●</span>
-
-          <span class="stat-badge">
-            LIVE
-          </span>
-        </div>
-
-        <div class="stat-label">
-          {{ i18n.t('trade.dashboard.cards.openTrades') }}
-        </div>
-
-        <div class="stat-value">
-          {{ analytics().openTrades }}
-        </div>
-
-        <div class="stat-footer">
-          <span class="status-dot status-dot--yellow"></span>
-          MARKET ACTIVE
-        </div>
-
-      </article>
-
-
-      <!-- CLOSED -->
-      <article class="stat-card stat-card--blue">
-
-        <div class="stat-card-top">
-          <span class="stat-icon">✓</span>
-
-          <span class="stat-badge">
-            DONE
-          </span>
-        </div>
-
-        <div class="stat-label">
-          {{ i18n.t('trade.dashboard.cards.closedTrades') }}
-        </div>
-
-        <div class="stat-value">
-          {{ analytics().closedTrades }}
-        </div>
-
-        <div class="stat-footer">
-          <span class="status-dot status-dot--blue"></span>
-          COMPLETED
-        </div>
-
-      </article>
-
-
-      <!-- MOST TRADED -->
-      <article class="stat-card stat-card--red">
-
-        <div class="stat-card-top">
-          <span class="stat-icon">◆</span>
-
-          <span class="stat-badge">
-            TOP
-          </span>
-        </div>
-
-        <div class="stat-label">
-          {{ i18n.t('trade.dashboard.cards.mostTraded') }}
-        </div>
-
-        <div class="stat-value stat-value--symbol">
-          {{ analytics().mostTradedSymbol }}
-        </div>
-
-        <div class="stat-footer">
-          <span class="status-dot status-dot--red"></span>
-          MAIN SYMBOL
-        </div>
-
-      </article>
-
-
-      <!-- PNL -->
-      <article
-        class="stat-card stat-card--pnl"
-        [class.stat-card--profit]="(analytics().estimatedPnl ?? 0) >= 0"
-        [class.stat-card--loss]="(analytics().estimatedPnl ?? 0) < 0"
-      >
-
-        <div class="stat-card-top">
-          <span class="stat-icon">★</span>
-
-          <span class="stat-badge">
-            PNL
-          </span>
-        </div>
-
-        <div class="stat-label">
-          {{ i18n.t('trade.dashboard.cards.estimatedPnl') }}
-        </div>
-
-        <div class="stat-value stat-value--pnl">
-          {{ analytics().estimatedPnl ?? 'N/A' }}
-        </div>
-
-        <div class="stat-footer">
-          {{ i18n.t('trade.dashboard.cards.pnlNote', {
-            count: analytics().pnlTradeCount
-          }) }}
-        </div>
-
-      </article>
-
-    </section>
-
-
-    <!-- CHART AREA -->
-    <section class="charts-grid">
-
-      <!-- TRADES OVER TIME -->
-      <article class="chart-card chart-card--large">
-
-        <div class="chart-header">
-
-          <div>
-            <div class="chart-kicker">
-              <span>★</span>
-              TRADING JOURNEY
-            </div>
-
-            <h2>
-              {{ i18n.t('trade.dashboard.charts.tradesOverTime') }}
-            </h2>
-
-            <p>
-              {{ i18n.t('trade.dashboard.charts.tradesOverTimeDescription') }}
-            </p>
+            <button
+              type="button"
+              [disabled]="isSaving()"
+              (click)="addPrompt('improve'); noteInput.focus()"
+            >
+              ◎ {{ i18n.t('journal.improve') }}
+            </button>
           </div>
-
-          <div class="chart-mark">
-            {{ selectedRange() }}
+          @if (saveError()) {
+            <p class="save-error" role="alert">{{ saveError() }}</p>
+          }
+          <div class="editor-actions">
+            <button
+              class="button button--primary"
+              type="button"
+              [disabled]="isSaving() || !dirty()"
+              (click)="save()"
+            >
+              {{ i18n.t(isSaving() ? 'journal.saving' : 'journal.save') }}
+            </button>
+            <button
+              class="button button--next"
+              type="button"
+              [disabled]="isSaving()"
+              (click)="save(true)"
+            >
+              {{ i18n.t(dirty() ? 'journal.saveNext' : 'journal.nextTrade') }} →
+            </button>
+            <span class="draft-state" role="status">{{
+              i18n.t(dirty() ? 'journal.unsaved' : 'journal.upToDate')
+            }}</span>
           </div>
-
+          <p class="execution-hint">{{ i18n.t('journal.executionUnchanged') }}</p>
         </div>
-
-
-        <div class="bar-chart">
-
-          @for (point of tradesOverTime(); track point.label) {
-
-            <div class="bar-column">
-
-              <div class="bar-value">
-                {{ point.value }}
-              </div>
-
-              <div class="bar-track">
-
-                <div
-                  class="bar-fill"
-                  [style.height.%]="getBarHeight(
-                    point.value,
-                    tradesOverTime()
-                  )"
-                >
-                </div>
-
-              </div>
-
-              <span class="bar-label">
-                {{ point.label }}
-              </span>
-
-            </div>
-
-          }
-
+      } @else {
+        <div class="editor-empty">
+          <span aria-hidden="true">✎</span>
+          <h2>{{ i18n.t('journal.selectTrade') }}</h2>
+          <p>{{ i18n.t('journal.selectTradeHelp') }}</p>
         </div>
-
-      </article>
-
-
-      <!-- SYMBOL -->
-      <article class="chart-card">
-
-        <div class="chart-kicker">
-          <span>◆</span>
-          SYMBOLS
-        </div>
-
-        <h2>
-          {{ i18n.t('trade.dashboard.charts.symbolDistribution') }}
-        </h2>
-
-        <p>
-          {{ i18n.t('trade.dashboard.charts.symbolDistributionDescription') }}
-        </p>
-
-
-        <div class="distribution-list">
-
-          @for (item of symbolDistribution(); track item.label) {
-
-            <div class="distribution-item">
-
-              <div class="distribution-header">
-
-                <span>
-                  {{ item.label }}
-                </span>
-
-                <strong>
-                  {{ item.value }}
-                </strong>
-
-              </div>
-
-              <div class="distribution-track">
-
-                <div
-                  class="distribution-fill distribution-fill--green"
-                  [style.width.%]="getBarHeight(
-                    item.value,
-                    symbolDistribution()
-                  )"
-                >
-                </div>
-
-              </div>
-
-            </div>
-
-          } @empty {
-
-            <div class="empty-chart">
-              <span>○</span>
-              {{ i18n.t('trade.dashboard.charts.noSymbolData') }}
-            </div>
-
-          }
-
-        </div>
-
-      </article>
-
-
-      <!-- BUY / SELL -->
-      <article class="chart-card">
-
-        <div class="chart-kicker">
-          <span>⚔</span>
-          POSITION SIDE
-        </div>
-
-        <h2>
-          {{ i18n.t('trade.dashboard.charts.sideDistribution') }}
-        </h2>
-
-        <p>
-          {{ i18n.t('trade.dashboard.charts.sideDistributionDescription') }}
-        </p>
-
-
-        <div class="distribution-list">
-
-          @for (item of sideDistribution(); track item.label) {
-
-            <div class="distribution-item">
-
-              <div class="distribution-header">
-
-                <span>
-                  {{ formatSideLabel(item.label) }}
-                </span>
-
-                <strong>
-                  {{ item.value }}
-                </strong>
-
-              </div>
-
-              <div class="distribution-track">
-
-                <div
-                  class="distribution-fill"
-                  [ngClass]="
-                    item.label === 'BUY'
-                      ? 'distribution-fill--buy'
-                      : 'distribution-fill--sell'
-                  "
-                  [style.width.%]="getBarHeight(
-                    item.value,
-                    sideDistribution()
-                  )"
-                >
-                </div>
-
-              </div>
-
-            </div>
-
-          } @empty {
-
-            <div class="empty-chart">
-              <span>○</span>
-              {{ i18n.t('trade.dashboard.charts.noSideData') }}
-            </div>
-
-          }
-
-        </div>
-
-      </article>
-
+      }
     </section>
-
+  </div>
+  @if (statusMessage()) {
+    <p class="result-message" role="status" aria-live="polite">{{ statusMessage() }}</p>
   }
-
 </section>

@@ -34,6 +34,7 @@ export const routes: Routes = [
       },
       {
         path: 'trades',
+        canDeactivate: [(component: { canLeave: () => boolean }) => component.canLeave()],
         loadComponent: () =>
           import('./features/trade/pages/trade-overview-page/trade-overview-page.component').then((m) => m.TradeOverviewPageComponent)
       },
